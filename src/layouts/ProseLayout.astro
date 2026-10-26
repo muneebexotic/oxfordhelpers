@@ -1,0 +1,41 @@
+---
+import site from '../../site.config.mjs';
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { graph, webPageLd, breadcrumbLd, absUrl } from '../lib/seo';
+
+interface Props {
+  title: string;
+  h1: string;
+  description: string;
+  path: string;
+  eyebrow: string;
+  lead?: string;
+}
+const { title, h1, description, path, eyebrow, lead } = Astro.props;
+const crumbs = [
+  { name: 'Home', path: '/' },
+  { name: h1, path },
+];
+const updated = new Date(`${site.legalUpdated}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+const jsonLd = graph(webPageLd({ path, title: h1, description, crumbs, dateModified: site.legalUpdated }), breadcrumbLd(crumbs, absUrl(path)));
+---
+
+<BaseLayout {title} {description} {path} {jsonLd}>
+  <section class="page-hero">
+    <div class="container container--narrow">
+      <Breadcrumbs {crumbs} />
+      <p class="eyebrow">{eyebrow}</p>
+      <h1>{h1}</h1>
+      {lead && <p class="lead">{lead}</p>}
+      <p class="small muted">Last updated <time datetime={site.legalUpdated}>{updated}</time></p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container container--narrow">
+      <div class="prose">
+        <slot />
+      </div>
+    </div>
+  </section>
+</BaseLayout>

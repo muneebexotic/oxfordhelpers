@@ -1,0 +1,28 @@
+---
+import Icon from './Icon.astro';
+import type { Service } from '../data/services';
+
+interface Props {
+  service: Service;
+  headingLevel?: 'h2' | 'h3';
+}
+const { service, headingLevel = 'h3' } = Astro.props;
+const Heading = headingLevel;
+---
+
+<article class="card card--link">
+  <span class="icon-tile"><Icon name={service.icon} size={24} /></span>
+  <Heading><a href={`/${service.slug}/`}>{service.name}</a></Heading>
+  <p>{service.cardSummary}</p>
+  <ul class="checklist">
+    {
+      service.cardPoints.map((p) => (
+        <li>
+          <Icon name="check" size={16} />
+          {p}
+        </li>
+      ))
+    }
+  </ul>
+  <span class="text-link" aria-hidden="true">Learn more <Icon name="arrow-right" size={16} /></span>
+</article>

@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { services } from '../data/services';
+---
+
+<BaseLayout title="Page not found" description="The page you were looking for doesn’t exist or has moved." path="/404/" noindex>
+  <section class="section error-page">
+    <div class="container container--narrow">
+      <p class="code" aria-hidden="true">404</p>
+      <h1>We can’t find that page</h1>
+      <p class="lead">It may have moved, or the link may be mistyped. These might help:</p>
+      <ul class="related-links mt-lg">
+        {
+          services.map((s) => (
+            <li>
+              <a href={`/${s.slug}/`}>
+                <span>{s.name} support</span>
+                <Icon name="arrow-right" size={18} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="btn-row mt-lg error-actions">
+        <a class="btn btn--brand" href="/">Go to the homepage</a>
+        <a class="btn btn--ghost" href="/contact/">Contact us</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .error-page .related-links { text-align: left; }
+  .error-actions { justify-content: center; }
+</style>

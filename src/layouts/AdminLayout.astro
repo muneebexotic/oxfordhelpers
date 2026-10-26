@@ -1,0 +1,69 @@
+---
+import '@fontsource-variable/inter/wght.css';
+import '../styles/global.css';
+import site from '../../site.config.mjs';
+
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title} · {site.brand.name} admin</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body class="admin">
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  body.admin { background: #f4f6f8; font-size: 0.9375rem; }
+  .admin-bar {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 12px var(--gutter);
+    background: var(--brand-900); color: #fff;
+  }
+  .admin-bar strong { font-family: var(--font-serif); font-size: 1.125rem; }
+  .admin-bar form { margin: 0; }
+  .admin-main { max-width: 1280px; margin: 0 auto; padding: 24px var(--gutter) 64px; display: grid; gap: 24px; }
+  .panel { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 20px; overflow: hidden; }
+  .panel h2 { font-family: var(--font-sans); font-size: 1.125rem; font-weight: 700; margin-bottom: 4px; }
+  .panel > p.muted { margin-bottom: 16px; }
+  .kpis { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+  .kpi { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .kpi strong { display: block; font-size: 1.9rem; line-height: 1.1; color: var(--ink-900); font-variant-numeric: tabular-nums; }
+  .kpi span { font-size: 0.875rem; color: var(--ink-600); }
+  .kpi--main { background: var(--brand-700); border-color: var(--brand-700); }
+  .kpi--main strong, .kpi--main span { color: #fff; }
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table.data { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  table.data th, table.data td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  table.data th { background: #f8fafb; font-weight: 650; color: var(--ink-800); white-space: nowrap; }
+  table.data td.num, table.data th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  table.data .msg { max-width: 360px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .periods { display: flex; flex-wrap: wrap; gap: 8px; }
+  .periods a { padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line-strong); background: #fff; color: var(--ink-800); text-decoration: none; font-weight: 600; }
+  .periods a[aria-current='page'] { background: var(--brand-700); border-color: var(--brand-700); color: #fff; }
+  .row-form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 0; }
+  .row-form select, .admin .compact-input { min-height: 34px; padding: 4px 8px; border: 1px solid var(--line-strong); border-radius: 8px; font: inherit; font-size: 0.8125rem; background: #fff; }
+  .row-form button, .btn-xs { min-height: 34px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line-strong); background: #fff; font: inherit; font-size: 0.8125rem; font-weight: 600; cursor: pointer; }
+  .btn-xs--danger { color: var(--danger); }
+  .three { display: grid; gap: 24px; }
+  @media (min-width: 900px) { .three { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 650; background: var(--brand-50); color: var(--brand-800); white-space: nowrap; }
+  .badge--warn { background: var(--accent-100); color: #7a4708; }
+  .badge--muted { background: #eef0f2; color: var(--ink-600); }
+  .wa-form { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); align-items: end; }
+  .wa-form .field input, .wa-form .field select { min-height: 42px; padding: 8px 10px; font-size: 0.9375rem; }
+  .wa-form .check { display: flex; gap: 8px; align-items: center; min-height: 42px; font-weight: 600; }
+  .login { min-height: 100dvh; display: grid; place-items: center; padding: 24px; }
+  .login .form-card { width: min(420px, 100%); }
+</style>

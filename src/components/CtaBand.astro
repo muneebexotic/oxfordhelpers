@@ -1,0 +1,41 @@
+---
+import site from '../../site.config.mjs';
+import Icon from './Icon.astro';
+import WhatsAppLink from './WhatsAppLink.astro';
+
+interface Props {
+  title?: string;
+  service?: string;
+}
+const { title = 'Tell us what you’re working on', service } = Astro.props;
+---
+
+<section class="section section--tight" aria-labelledby="cta-title">
+  <div class="container">
+    <div class="cta-band">
+      <div class="cta-band__inner">
+        <div>
+          <h2 id="cta-title">{title}</h2>
+          <p>
+            Get a free, no-obligation quote. Share your subject, level and deadline, and we’ll recommend the right support
+            {site.contact.replyTarget}.
+          </p>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn--primary" href="/contact/">Get a free quote <Icon name="arrow-right" size={18} /></a>
+          {
+            site.contact.whatsapp ? (
+              <WhatsAppLink service={service} class="btn btn--on-dark">
+                <Icon name="whatsapp" size={20} /> WhatsApp us
+              </WhatsAppLink>
+            ) : (
+              <a class="btn btn--on-dark" href={`mailto:${site.contact.email}`}>
+                <Icon name="mail" size={18} /> Email us
+              </a>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

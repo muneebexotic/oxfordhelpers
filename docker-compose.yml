@@ -1,0 +1,56 @@
+# Production stack: the Node app behind Caddy (automatic HTTPS, redirects, security headers).
+#   cp .env.example .env   # fill it in
+#   docker compose up -d --build
+services:
+  app:
+    build:
+      context: .
+      args:
+        SITE_DOMAIN: ${SITE_DOMAIN}
+        BRAND_NAME: ${BRAND_NAME:-}
+        CONTACT_EMAIL: ${CONTACT_EMAIL:-}
+        CONTACT_WHATSAPP: ${CONTACT_WHATSAPP:-}
+        CONTACT_PHONE: ${CONTACT_PHONE:-}
+        CONTACT_HOURS: ${CONTACT_HOURS:-}
+        REPLY_TARGET: ${REPLY_TARGET:-}
+        BUSINESS_LEGAL_NAME: ${BUSINESS_LEGAL_NAME:-}
+        BUSINESS_COMPANY_NUMBER: ${BUSINESS_COMPANY_NUMBER:-}
+        BUSINESS_ADDRESS: ${BUSINESS_ADDRESS:-}
+        BUSINESS_ICO_NUMBER: ${BUSINESS_ICO_NUMBER:-}
+        SOCIAL_INSTAGRAM: ${SOCIAL_INSTAGRAM:-}
+        SOCIAL_LINKEDIN: ${SOCIAL_LINKEDIN:-}
+        SOCIAL_FACEBOOK: ${SOCIAL_FACEBOOK:-}
+        GOOGLE_SITE_VERIFICATION: ${GOOGLE_SITE_VERIFICATION:-}
+        BING_SITE_VERIFICATION: ${BING_SITE_VERIFICATION:-}
+        RETENTION_DAYS: ${RETENTION_DAYS:-180}
+    env_file: .env
+    environment:
+      TRUST_PROXY: '1'
+      DATABASE_PATH: /app/data/leads.sqlite
+    volumes:
+      - app-data:/app/data
+    restart: unless-stopped
+    expose:
+      - '4321'
+
+  caddy:
+    image: caddy:2-alpine
+    depends_on:
+      - app
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+
+volumes:
+  app-data:
+  caddy-data:
+  caddy-config:

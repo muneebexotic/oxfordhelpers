@@ -1,0 +1,79 @@
+---
+import site from '../../site.config.mjs';
+import ProseLayout from '../layouts/ProseLayout.astro';
+---
+
+<ProseLayout
+  title="Academic Integrity Policy"
+  h1="Academic integrity policy"
+  eyebrow="Our standards"
+  path="/academic-integrity/"
+  description={`How ${site.brand.name} supports students within UK academic integrity rules: what we do, what we never do, and how we handle proofreading and school assessments.`}
+  lead="Everything we offer is designed to help you produce your own best work, never to produce work for you."
+>
+  <h2>Our commitment</h2>
+  <p>
+    Academic integrity means the work you submit is your own and fairly represents your knowledge and skills. We take that seriously
+    because your degree depends on it, and because good support should make you more capable, not more dependent.
+  </p>
+
+  <h2>The law in England</h2>
+  <p>
+    Under the Skills and Post-16 Education Act 2022 (sections 26 to 28), it is a criminal offence to provide, arrange or advertise, in
+    commercial circumstances, a service of completing all or part of an assignment on behalf of a student in England, where the
+    assignment completed in that way could not reasonably be considered to have been completed personally by the student. Every UK
+    university also treats submitting work produced by someone else as academic misconduct. We do not offer such services in any
+    form.
+  </p>
+
+  <h2>What we do</h2>
+  <ul>
+    <li><strong>Tutoring:</strong> explaining concepts, theories, methods and marking criteria in one-to-one sessions.</li>
+    <li><strong>Planning support:</strong> helping you break down a brief, plan a structure and manage your time.</li>
+    <li><strong>Feedback:</strong> written comments on drafts you have written, explaining what could be improved and why, for you to act on.</li>
+    <li><strong>Proofreading:</strong> flagging spelling, grammar, punctuation and formatting issues within the limits below.</li>
+    <li><strong>Methods coaching:</strong> helping you choose, run and interpret your own analysis on your own data.</li>
+  </ul>
+
+  <h2>What we never do</h2>
+  <ul>
+    <li>Write, rewrite, paraphrase or complete any assessed work, or any part of it, for submission.</li>
+    <li>Sit, or help during, tests, quizzes or exams, or log in to university systems on a student’s behalf.</li>
+    <li>Collect, invent, alter or analyse data on a student’s behalf.</li>
+    <li>Use generative AI to produce content for a student’s assessed work.</li>
+    <li>Comment on or edit school or college assessments that a teacher must authenticate (see below).</li>
+  </ul>
+
+  <h2>Our proofreading standard</h2>
+  <p>
+    By default we follow the limits common to UK university proofreading policies. We identify spelling, grammar, punctuation,
+    formatting and consistency issues and flag unclear sentences for you to rewrite. We don’t add or change content, restructure
+    your work, correct factual errors or rewrite passages. Changes are suggested using tracked changes and comments, so you make
+    every decision. If your university’s policy is stricter, we follow it; send it to us before we start.
+  </p>
+
+  <h2>A-level, GCSE, BTEC and similar qualifications</h2>
+  <p>
+    Non-exam assessments and coursework for these qualifications must be authenticated by your teacher as your own work, and outside
+    help with the assessed piece can be treated as malpractice. For these qualifications we teach subject knowledge and skills only,
+    and we do not read, annotate or suggest content for the assessed work itself.
+  </p>
+
+  <h2>Declaring support</h2>
+  <p>
+    Some universities ask students to declare proofreading or other support. If yours does, we’ll give you a short, accurate statement
+    describing exactly what we did.
+  </p>
+
+  <h2>Requests outside this policy</h2>
+  <p>
+    If we’re asked for something we don’t do, we’ll say so clearly and suggest the support we can offer instead. We may decline or end
+    any arrangement that would breach this policy.
+  </p>
+
+  <h2>Questions or concerns</h2>
+  <p>
+    If you have a question about this policy, or a concern about how it’s being applied, email
+    <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.
+  </p>
+</ProseLayout>

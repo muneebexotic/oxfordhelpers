@@ -1,0 +1,104 @@
+---
+import site from '../../site.config.mjs';
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import WhatsAppLink from './WhatsAppLink.astro';
+import { services } from '../data/services';
+
+interface Props {
+  minimal?: boolean;
+}
+const { minimal = false } = Astro.props;
+const year = new Date().getFullYear();
+const owner = site.business.legalName || site.brand.name;
+const socials = [
+  { key: 'instagram', url: site.social.instagram, label: 'Instagram' },
+  { key: 'linkedin', url: site.social.linkedin, label: 'LinkedIn' },
+  { key: 'facebook', url: site.social.facebook, label: 'Facebook' },
+].filter((s) => s.url) as { key: 'instagram' | 'linkedin' | 'facebook'; url: string; label: string }[];
+---
+
+<footer class="site-footer">
+  <div class="container">
+    {
+      !minimal && (
+        <div class="footer__grid">
+          <div class="footer__brand">
+            <Logo inverse />
+            <p>{site.brand.tagline} Tutoring, feedback, proofreading and research methods coaching for students across the UK.</p>
+            {socials.length > 0 && (
+              <div class="footer__social">
+                {socials.map((s) => (
+                  <a href={s.url} rel="noopener me" target="_blank" aria-label={`${site.brand.name} on ${s.label}`}>
+                    <Icon name={s.key} size={18} />
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+          <div>
+            <h2 class="footer__title">Company</h2>
+            <ul class="footer__list">
+              <li><a href="/">Home</a></li>
+              <li><a href="/about/">About us</a></li>
+              <li><a href="/services/">Services</a></li>
+              <li><a href="/guides/">Study guides</a></li>
+              <li><a href="/academic-integrity/">Academic integrity</a></li>
+              <li><a href="/contact/">Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h2 class="footer__title">Services</h2>
+            <ul class="footer__list">
+              {services.map((s) => (
+                <li><a href={`/${s.slug}/`}>{s.name}</a></li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h2 class="footer__title">Get in touch</h2>
+            <ul class="footer__list">
+              <li>
+                <a href={`mailto:${site.contact.email}`}><Icon name="mail" size={16} /> {site.contact.email}</a>
+              </li>
+              {site.contact.phone && (
+                <li>
+                  <a href={`tel:${site.contact.phone.replace(/[^\d+]/g, '')}`}><Icon name="phone" size={16} /> {site.contact.phone}</a>
+                </li>
+              )}
+              {site.contact.whatsapp && (
+                <li>
+                  <WhatsAppLink class="footer__wa">
+                    <Icon name="whatsapp" size={16} /> WhatsApp us
+                  </WhatsAppLink>
+                </li>
+              )}
+              <li class="muted">{site.contact.hours}</li>
+              {site.business.address && <li class="muted">{site.business.address}</li>}
+            </ul>
+          </div>
+        </div>
+      )
+    }
+
+    <p class="footer__note">
+      {site.brand.name} is an independent academic support service. We are not affiliated with, endorsed by or connected to
+      {site.brand.place ? ` the University of ${site.brand.place} or` : ''} any other university, college or awarding body. We provide tutoring,
+      feedback and proofreading only, and do not produce work for students to submit.
+    </p>
+
+    <div class="footer__bottom">
+      <p>
+        © {year} {owner}.
+        {site.business.companyNumber && ` Registered in England and Wales, company no. ${site.business.companyNumber}.`}
+        {site.business.icoRegistration && ` ICO registration ${site.business.icoRegistration}.`}
+      </p>
+      <ul>
+        <li><a href="/privacy/">Privacy</a></li>
+        <li><a href="/terms/">Terms</a></li>
+        <li><a href="/academic-integrity/">Integrity policy</a></li>
+        <li><a href="/sitemap.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,123 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Icon from '../../components/Icon.astro';
+import ServiceCard from '../../components/ServiceCard.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { getGuides, type Guide } from '../../lib/guides';
+import { serviceBySlug } from '../../data/services';
+import { graph, webPageLd, breadcrumbLd, articleLd, absUrl, ogImageFor } from '../../lib/seo';
+
+export const getStaticPaths = (async () => {
+  const guides = await getGuides();
+  return guides.map((guide) => ({ params: { slug: guide.id }, props: { guide, others: guides.filter((g) => g.id !== guide.id) } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  guide: Guide;
+  others: Guide[];
+}
+const { guide, others } = Astro.props;
+const { Content, headings } = await render(guide);
+const d = guide.data;
+const path = `/guides/${guide.id}/`;
+const crumbs = [
+  { name: 'Home', path: '/' },
+  { name: 'Guides', path: '/guides/' },
+  { name: d.seoTitle, path },
+];
+const toc = headings.filter((h) => h.depth === 2);
+const relatedServices = d.services.map((s) => serviceBySlug(s)!).slice(0, 3);
+const fmt = (date: Date) => date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+const image = ogImageFor(`guide-${guide.id}`);
+
+const jsonLd = graph(
+  webPageLd({ path, title: d.title, description: d.description, crumbs, image, dateModified: d.updated.toISOString().slice(0, 10) }),
+  breadcrumbLd(crumbs, absUrl(path)),
+  articleLd({ path, title: d.title, description: d.description, published: d.published, updated: d.updated, image }),
+);
+---
+
+<BaseLayout title={d.seoTitle} description={d.description} {path} og={`guide-${guide.id}`} type="article" published={d.published} modified={d.updated} {jsonLd}>
+  <section class="page-hero">
+    <div class="container guide-head">
+      <Breadcrumbs {crumbs} />
+      <p class="eyebrow">Study guide</p>
+      <h1>{d.title}</h1>
+      <p class="lead">{d.summary}</p>
+      <p class="article-meta">
+        <span><Icon name="clock" size={16} /> {guide.minutes} min read</span>
+        <span><Icon name="calendar" size={16} /> Updated <time datetime={d.updated.toISOString().slice(0, 10)}>{fmt(d.updated)}</time></span>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container split split--aside guide-layout">
+      <article class="prose">
+        <Content />
+      </article>
+      <aside class="guide-aside">
+        {
+          toc.length > 2 && (
+            <nav class="toc" aria-label="On this page">
+              <h2>On this page</h2>
+              <ol>
+                {toc.map((h) => (
+                  <li>
+                    <a href={`#${h.slug}`}>{h.text}</a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )
+        }
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section--paper" aria-labelledby="related-title">
+    <div class="container">
+      <SectionHead title="Get support with this" id="related-title" />
+      <div class="grid grid--3">
+        {relatedServices.map((s) => <ServiceCard service={s} />)}
+      </div>
+      {
+        others.length > 0 && (
+          <div class="mt-lg">
+            <h3>More study guides</h3>
+            <ul class="related-links grid grid--3">
+              {others.map((g) => (
+                <li>
+                  <a href={`/guides/${g.id}/`}>
+                    <span>
+                      {g.data.title}
+                      <small>{g.minutes} min read</small>
+                    </span>
+                    <Icon name="arrow-right" size={18} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <CtaBand title="Want feedback on your own draft?" />
+</BaseLayout>
+
+<style>
+  .guide-head h1, .guide-head .lead { max-width: 760px; }
+  @media (max-width: 959px) {
+    .guide-aside { display: none; }
+  }
+  @media (min-width: 960px) {
+    .guide-layout { grid-template-columns: minmax(0, 1fr) 280px; }
+    .guide-aside { order: 2; }
+  }
+</style>

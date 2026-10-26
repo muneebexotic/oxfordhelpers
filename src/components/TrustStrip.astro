@@ -1,0 +1,21 @@
+---
+import Icon from './Icon.astro';
+import { TRUST_POINTS } from '../data/content';
+---
+
+<section class="trust" aria-label="Why students contact us">
+  <div class="container">
+    <ul class="trust__list">
+      {
+        TRUST_POINTS.map((t) => (
+          <li>
+            <span class="icon-wrap">
+              <Icon name={t.icon} size={18} />
+            </span>
+            {t.text}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

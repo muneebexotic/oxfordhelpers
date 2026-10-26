@@ -1,0 +1,309 @@
+---
+import site from '../../site.config.mjs';
+import Icon from './Icon.astro';
+import { SERVICE_OPTIONS, LEVEL_OPTIONS, SUPPORT_OPTIONS } from '../data/services';
+
+interface Props {
+  /** full: contact page. compact: service-page sidebar. callback: help widget. */
+  variant?: 'full' | 'compact' | 'callback';
+  service?: string;
+  id?: string;
+  heading?: string;
+}
+const { variant = 'full', service, id = 'enquiry', heading } = Astro.props;
+const uid = `${id}-`;
+const isCallback = variant === 'callback';
+const isFull = variant === 'full';
+---
+
+<form
+  class="enquiry-form"
+  id={id}
+  action="/api/enquiry/"
+  method="post"
+  data-enquiry-form
+  data-variant={variant}
+>
+  {heading && <h2>{heading}</h2>}
+  <input type="hidden" name="channel" value={isCallback ? 'callback' : 'form'} />
+  <input type="hidden" name="page" value="" data-page />
+  <div class="hp-field" aria-hidden="true">
+    <label for={`${uid}website`}>Leave this field empty</label>
+    <input id={`${uid}website`} name="company_website" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <div class:list={['form-grid', { 'form-grid--2': isFull }]}>
+    <div class="field">
+      <label for={`${uid}name`}>Your name</label>
+      <input id={`${uid}name`} name="name" type="text" autocomplete="name" required minlength="2" maxlength="80" />
+      <p class="field__error" id={`${uid}name-error`}></p>
+    </div>
+
+    {
+      !isCallback && (
+        <div class="field">
+          <label for={`${uid}email`}>Email</label>
+          <input id={`${uid}email`} name="email" type="email" autocomplete="email" inputmode="email" required maxlength="200" />
+          <p class="field__error" id={`${uid}email-error`} />
+        </div>
+      )
+    }
+
+    <div class="field">
+      <label for={`${uid}phone`}>
+        {isCallback ? 'WhatsApp or mobile number' : <>WhatsApp or phone <span class="optional">(optional)</span></>}
+      </label>
+      <input
+        id={`${uid}phone`}
+        name="phone"
+        type="tel"
+        autocomplete="tel"
+        inputmode="tel"
+        maxlength="24"
+        placeholder="+44 7…"
+        required={isCallback}
+      />
+      <p class="field__error" id={`${uid}phone-error`}></p>
+    </div>
+
+    {
+      isFull && (
+        <fieldset class="field">
+          <legend>Best way to reply</legend>
+          <div class="toggle-group">
+            {[
+              ['email', 'Email'],
+              ['whatsapp', 'WhatsApp'],
+              ['phone', 'Phone call'],
+            ].map(([value, label], i) => (
+              <label class="toggle">
+                <input type="radio" name="contact_pref" value={value} checked={i === 0} />
+                <Icon name="check" size={16} />
+                {label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )
+    }
+
+    <div class="field">
+      <label for={`${uid}service`}>What do you need help with?</label>
+      <select id={`${uid}service`} name="service" required>
+        <option value="" disabled selected={!service}>Choose one…</option>
+        {SERVICE_OPTIONS.map((o) => <option value={o.value} selected={o.value === service}>{o.label}</option>)}
+      </select>
+      <p class="field__error" id={`${uid}service-error`}></p>
+    </div>
+
+    {
+      !isCallback && (
+        <div class="field">
+          <label for={`${uid}level`}>
+            Level of study <span class="optional">(optional)</span>
+          </label>
+          <select id={`${uid}level`} name="level">
+            <option value="">Choose…</option>
+            {LEVEL_OPTIONS.map((o) => (
+              <option value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
+      )
+    }
+
+    {
+      isFull && (
+        <>
+          <div class="field">
+            <label for={`${uid}subject`}>
+              Subject or course <span class="optional">(optional)</span>
+            </label>
+            <input id={`${uid}subject`} name="subject" type="text" maxlength="120" placeholder="e.g. BSc Psychology" />
+          </div>
+          <div class="field">
+            <label for={`${uid}deadline`}>
+              Deadline <span class="optional">(optional)</span>
+            </label>
+            <input id={`${uid}deadline`} name="deadline" type="date" data-min-today />
+          </div>
+          <fieldset class="field field--full">
+            <legend>
+              Type of support <span class="optional">(choose any)</span>
+            </legend>
+            <div class="toggle-group">
+              {SUPPORT_OPTIONS.map((o) => (
+                <label class="toggle">
+                  <input type="checkbox" name="support_types" value={o.value} />
+                  <Icon name="check" size={16} />
+                  {o.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        </>
+      )
+    }
+
+    {
+      !isCallback && (
+        <div class="field field--full">
+          <label for={`${uid}message`}>Tell us about it</label>
+          <textarea
+            id={`${uid}message`}
+            name="message"
+            required
+            minlength="10"
+            maxlength="3000"
+            rows={isFull ? 5 : 4}
+            placeholder="What’s the task, where are you stuck, and what would help most?"
+          />
+          <p class="field__hint">Please don’t include sensitive personal information. You can share files once we reply.</p>
+          <p class="field__error" id={`${uid}message-error`} />
+        </div>
+      )
+    }
+
+    <div class="field field--full">
+      <div class="consent">
+        <input id={`${uid}consent`} name="consent" type="checkbox" value="yes" required />
+        <label for={`${uid}consent`}>
+          I understand {site.brand.name} offers tutoring, feedback and proofreading, not work for me to submit, and I’ve read the
+          <a href="/privacy/" target="_blank">privacy notice</a>.
+        </label>
+      </div>
+      <p class="field__error" id={`${uid}consent-error`}></p>
+    </div>
+
+    <div class="field field--full">
+      <p class="form-status" role="status" aria-live="polite" data-status></p>
+      <button class="btn btn--primary btn--block" type="submit">
+        {isCallback ? 'Message me back' : 'Get my free quote'}
+        <Icon name="arrow-right" size={18} />
+      </button>
+      {!isCallback && <p class="field__hint center">No obligation. We aim to reply {site.contact.replyTarget}.</p>}
+    </div>
+  </div>
+</form>
+
+<script>
+  import { getAttribution } from '../scripts/attribution';
+
+  const MESSAGES: Record<string, string> = {
+    name: 'Please tell us your name.',
+    email: 'Please enter a valid email address.',
+    phone: 'Please enter a valid phone number.',
+    service: 'Please choose the kind of work you need help with.',
+    message: 'Please tell us a little about what you need (at least a sentence).',
+    consent: 'Please confirm you’ve read how we use your details.',
+  };
+
+  function setError(form: HTMLFormElement, name: string, message: string | null) {
+    const input = form.elements.namedItem(name) as HTMLInputElement | null;
+    const field = input?.closest?.('.field') as HTMLElement | null;
+    const err = field?.querySelector<HTMLElement>('.field__error');
+    if (!field || !err || !input) return;
+    field.toggleAttribute('data-invalid', Boolean(message));
+    err.textContent = message ?? '';
+    if (message) {
+      input.setAttribute('aria-invalid', 'true');
+      input.setAttribute('aria-describedby', err.id);
+    } else {
+      input.removeAttribute('aria-invalid');
+    }
+  }
+
+  function clientValidate(form: HTMLFormElement) {
+    let first: HTMLElement | null = null;
+    for (const name of Object.keys(MESSAGES)) {
+      const input = form.elements.namedItem(name) as HTMLInputElement | null;
+      if (!input || !('checkValidity' in input)) continue;
+      const ok = input.checkValidity();
+      setError(form, name, ok ? null : MESSAGES[name]);
+      if (!ok && !first) first = input;
+    }
+    // Asking to be contacted by WhatsApp/phone needs a number.
+    const pref = (form.elements.namedItem('contact_pref') as RadioNodeList | null)?.value;
+    const phone = form.elements.namedItem('phone') as HTMLInputElement | null;
+    if (phone && (pref === 'whatsapp' || pref === 'phone') && !phone.value.trim()) {
+      setError(form, 'phone', 'Please add a number so we can contact you that way.');
+      first ??= phone;
+    }
+    first?.focus();
+    return !first;
+  }
+
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-enquiry-form]')) {
+    form.noValidate = true; // JS handles validation; without JS the browser validates natively
+    const started = performance.now();
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+    const pageInput = form.querySelector<HTMLInputElement>('[data-page]');
+    if (pageInput) pageInput.value = location.pathname;
+
+    const dateInput = form.querySelector<HTMLInputElement>('[data-min-today]');
+    if (dateInput) dateInput.min = new Date().toISOString().slice(0, 10);
+
+    form.addEventListener('input', (e) => {
+      const t = e.target as HTMLInputElement;
+      if (t.name && t.closest('.field')?.hasAttribute('data-invalid') && t.checkValidity()) setError(form, t.name, null);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.removeAttribute('data-state');
+      if (!clientValidate(form)) return;
+
+      const data: Record<string, string | string[]> = {};
+      for (const [k, v] of new FormData(form).entries()) {
+        if (typeof v !== 'string') continue;
+        if (k === 'support_types') ((data[k] ??= []) as string[]).push(v);
+        else data[k] = v;
+      }
+      Object.assign(data, getAttribution(), { elapsed_ms: String(Math.round(performance.now() - started)) });
+
+      button.setAttribute('aria-busy', 'true');
+      button.disabled = true;
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (res.ok && body.ok) {
+          if (form.dataset.variant === 'callback') {
+            const done = document.createElement('div');
+            done.className = 'form-success';
+            done.setAttribute('role', 'status');
+            const title = document.createElement('p');
+            title.innerHTML = '<strong>Thanks, we’ll message you soon.</strong>';
+            done.append(title);
+            if (body.ref) {
+              const ref = document.createElement('p');
+              ref.className = 'small muted';
+              ref.textContent = `Your reference: ${body.ref}`;
+              done.append(ref);
+            }
+            form.replaceChildren(done);
+          } else {
+            location.assign(`/contact/thanks/${body.ref ? `?ref=${encodeURIComponent(body.ref)}` : ''}`);
+          }
+          return;
+        }
+        if (body.errors) {
+          for (const [name, msg] of Object.entries(body.errors as Record<string, string>)) setError(form, name, msg);
+        }
+        status.dataset.state = 'error';
+        status.textContent =
+          body.errors?.form ?? (res.status === 429 ? 'Too many attempts, please try again shortly.' : 'Please check the highlighted fields.');
+      } catch {
+        status.dataset.state = 'error';
+        status.textContent = 'We couldn’t send that. Please check your connection, or message us on WhatsApp or email.';
+      } finally {
+        button.removeAttribute('aria-busy');
+        button.disabled = false;
+      }
+    });
+  }
+</script>

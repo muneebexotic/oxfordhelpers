@@ -1,0 +1,20 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  slug: string;
+  title: string;
+  summary: string;
+  minutes: number;
+  headingLevel?: 'h2' | 'h3';
+}
+const { slug, title, summary, minutes, headingLevel = 'h3' } = Astro.props;
+const Heading = headingLevel;
+---
+
+<article class="card card--link">
+  <span class="icon-tile icon-tile--accent"><Icon name="book" size={22} /></span>
+  <Heading><a href={`/guides/${slug}/`}>{title}</a></Heading>
+  <p>{summary}</p>
+  <span class="text-link" aria-hidden="true">{minutes} min read <Icon name="arrow-right" size={16} /></span>
+</article>

@@ -1,0 +1,129 @@
+---
+import site from '../../site.config.mjs';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Icon from '../components/Icon.astro';
+import SectionHead from '../components/SectionHead.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
+import Proof from '../components/Proof.astro';
+import FaqList from '../components/FaqList.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { services } from '../data/services';
+import { ABOUT_PRINCIPLES, HOME_FAQS } from '../data/content';
+import { graph, webPageLd, breadcrumbLd, absUrl, ogImageFor } from '../lib/seo';
+
+const path = '/about/';
+const title = `About ${site.brand.name}: Independent Academic Support`;
+const description = `${site.brand.name} is an independent academic support service offering tutoring, draft feedback, proofreading and research methods coaching to UK students.`;
+const crumbs = [
+  { name: 'Home', path: '/' },
+  { name: 'About', path },
+];
+const faqs = HOME_FAQS.slice(0, 4);
+
+const jsonLd = graph(webPageLd({ path, title, description, type: 'AboutPage', crumbs, image: ogImageFor('about') }), breadcrumbLd(crumbs, absUrl(path)));
+---
+
+<BaseLayout {title} {description} {path} og="about" {jsonLd} brandInTitle={false}>
+  <section class="page-hero">
+    <div class="container">
+      <Breadcrumbs {crumbs} />
+      <p class="eyebrow">About us</p>
+      <h1>Support that helps students do their best work</h1>
+      <p class="lead">
+        {site.brand.name} is an independent academic support service for students at UK colleges and universities. We help you
+        understand what’s being asked, plan and write your own work, and get honest feedback before you submit.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="who-title">
+    <div class="container split split--even">
+      <div>
+        <h2 id="who-title">Who we are</h2>
+        <p>
+          University work asks a lot: independent research, unfamiliar conventions and tight deadlines, often alongside a job or
+          caring responsibilities. Many students only need a little guidance at the right moment to unlock their best work. We
+          provide that guidance one-to-one, in plain English, with feedback tied to the criteria you’ll actually be marked against.
+        </p>
+        <p>
+          We’re deliberately clear about our limits. Writing work for students to submit is a criminal offence for providers in
+          England and puts students’ degrees at risk, so we don’t do it. Everything we offer, from tutoring to proofreading, is
+          designed to sit within UK academic integrity rules.
+        </p>
+      </div>
+      <div>
+        <h2>Our mission</h2>
+        <p>
+          To make good academic support easy to find and safe to use: support that raises the quality of your work and your
+          confidence, and never puts your studies at risk.
+        </p>
+        <div class="notice mt-md">
+          <Icon name="info" size={18} />
+          <p>
+            {site.brand.name} is not affiliated with, endorsed by or connected to{site.brand.place ? ` the University of ${site.brand.place} or` : ''}
+            any other university, college or awarding body.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--paper" aria-labelledby="principles-title">
+    <div class="container">
+      <SectionHead eyebrow="How we work" title="Our principles" id="principles-title" />
+      <div class="grid grid--4">
+        {
+          ABOUT_PRINCIPLES.map((p) => (
+            <div class="card">
+              <span class="icon-tile">
+                <Icon name={p.icon} size={22} />
+              </span>
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="what-title">
+    <div class="container">
+      <SectionHead eyebrow="What we do" title="Five areas of support" id="what-title" />
+      <ul class="related-links grid grid--3">
+        {
+          services.map((s) => (
+            <li>
+              <a href={`/${s.slug}/`}>
+                <span>
+                  {s.name}
+                  <small>{s.cardSummary}</small>
+                </span>
+                <Icon name="arrow-right" size={18} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--paper" aria-labelledby="process-title">
+    <div class="container">
+      <SectionHead eyebrow="How it works" title="Our four-step process" id="process-title" />
+      <ProcessSteps />
+    </div>
+  </section>
+
+  <Proof />
+
+  <section class="section" aria-labelledby="faq-title">
+    <div class="container container--narrow">
+      <SectionHead eyebrow="FAQs" title="Questions about working with us" id="faq-title" />
+      <FaqList faqs={faqs} />
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>

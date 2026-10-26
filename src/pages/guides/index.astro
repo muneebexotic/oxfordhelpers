@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import GuideCard from '../../components/GuideCard.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { getGuides } from '../../lib/guides';
+import { graph, webPageLd, breadcrumbLd, itemListLd, absUrl, ogImageFor } from '../../lib/seo';
+
+const path = '/guides/';
+const title = 'Free Study Guides for UK Students';
+const description =
+  'Free, practical study guides on dissertation structure, UK referencing styles, university proofreading rules and reading an assignment brief.';
+const crumbs = [
+  { name: 'Home', path: '/' },
+  { name: 'Guides', path },
+];
+const guides = await getGuides();
+const jsonLd = graph(
+  webPageLd({ path, title, description, type: 'CollectionPage', crumbs, image: ogImageFor('guides') }),
+  breadcrumbLd(crumbs, absUrl(path)),
+  itemListLd(guides.map((g) => ({ name: g.data.title, path: `/guides/${g.id}/` })), absUrl(path)),
+);
+---
+
+<BaseLayout {title} {description} {path} og="guides" {jsonLd}>
+  <section class="page-hero">
+    <div class="container">
+      <Breadcrumbs {crumbs} />
+      <p class="eyebrow">Study guides</p>
+      <h1>Free study guides</h1>
+      <p class="lead">Clear, practical answers to the questions students ask us most, from structuring a dissertation to staying within proofreading rules.</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="grid grid--2">
+        {guides.map((g) => <GuideCard slug={g.id} title={g.data.title} summary={g.data.summary} minutes={g.minutes} headingLevel="h2" />)}
+      </div>
+    </div>
+  </section>
+  <CtaBand title="Want feedback on your own work?" />
+</BaseLayout>

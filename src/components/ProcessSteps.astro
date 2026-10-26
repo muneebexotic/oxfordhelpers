@@ -1,0 +1,18 @@
+---
+import { PROCESS_STEPS } from '../data/content';
+---
+
+<ol class="steps">
+  {
+    PROCESS_STEPS.map((s, i) => (
+      <li class="step">
+        <span class="step__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+        <h3>
+          <span class="visually-hidden">Step {i + 1}: </span>
+          {s.title}
+        </h3>
+        <p>{s.text}</p>
+      </li>
+    ))
+  }
+</ol>

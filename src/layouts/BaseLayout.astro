@@ -1,0 +1,108 @@
+---
+import '@fontsource-variable/inter/wght.css';
+import '@fontsource/fraunces/latin-600.css';
+import '@fontsource/fraunces/latin-600-italic.css';
+import '../styles/global.css';
+import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import frauncesLatin from '@fontsource/fraunces/files/fraunces-latin-600-normal.woff2?url';
+
+import site from '../../site.config.mjs';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Assist from '../components/Assist.astro';
+import { absUrl, ogImageFor, pageTitle } from '../lib/seo';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Canonical path with trailing slash, e.g. "/dissertation/". */
+  path: string;
+  /** Key of the generated Open Graph image in /og/ (defaults to "default"). */
+  og?: string;
+  noindex?: boolean;
+  type?: 'website' | 'article';
+  published?: Date;
+  modified?: Date;
+  jsonLd?: Record<string, unknown>;
+  /** Service slug used to pre-select the service in the help widget and WhatsApp message. */
+  service?: string;
+  brandInTitle?: boolean;
+  minimal?: boolean;
+}
+
+const {
+  title,
+  description,
+  path,
+  og = 'default',
+  noindex = false,
+  type = 'website',
+  published,
+  modified,
+  jsonLd,
+  service,
+  brandInTitle = true,
+  minimal = false,
+} = Astro.props;
+
+const fullTitle = pageTitle(title, { brand: brandInTitle });
+const canonical = absUrl(path);
+const ogImage = ogImageFor(og);
+const robots = noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1';
+---
+
+<!doctype html>
+<html lang="en-GB" data-ref-prefix={site.brand.initials}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="robots" content={robots} />
+
+    <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={frauncesLatin} as="font" type="font/woff2" crossorigin />
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0f5a60" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={site.brand.name} />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${site.brand.name}: ${title}`} />
+    {published && <meta property="article:published_time" content={published.toISOString()} />}
+    {modified && <meta property="article:modified_time" content={modified.toISOString()} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    {site.verification.google && <meta name="google-site-verification" content={site.verification.google} />}
+    {site.verification.bing && <meta name="msvalidate.01" content={site.verification.bing} />}
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c')} />}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header path={path} minimal={minimal} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer minimal={minimal} />
+    {!minimal && <Assist service={service} />}
+    <script>
+      import '../scripts/tracking';
+    </script>
+  </body>
+</html>

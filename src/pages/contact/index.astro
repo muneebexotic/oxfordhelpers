@@ -1,0 +1,117 @@
+---
+import site from '../../../site.config.mjs';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Icon from '../../components/Icon.astro';
+import EnquiryForm from '../../components/EnquiryForm.astro';
+import WhatsAppLink from '../../components/WhatsAppLink.astro';
+import { graph, webPageLd, breadcrumbLd, absUrl, ogImageFor } from '../../lib/seo';
+
+const path = '/contact/';
+const title = 'Contact Us for a Free Quote';
+const description = `Tell us about your assignment, coursework, dissertation, research or report and get a free, no-obligation quote. We aim to reply ${site.contact.replyTarget}.`;
+const crumbs = [
+  { name: 'Home', path: '/' },
+  { name: 'Contact', path },
+];
+const jsonLd = graph(webPageLd({ path, title, description, type: 'ContactPage', crumbs, image: ogImageFor('contact') }), breadcrumbLd(crumbs, absUrl(path)));
+---
+
+<BaseLayout {title} {description} {path} og="contact" {jsonLd}>
+  <section class="page-hero">
+    <div class="container">
+      <Breadcrumbs {crumbs} />
+      <p class="eyebrow">Contact</p>
+      <h1>Get a free, no-obligation quote</h1>
+      <p class="lead">
+        Tell us what you’re working on and where you’re stuck. We’ll reply {site.contact.replyTarget} with questions or a fixed
+        quote, and there’s no obligation to go ahead.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container split split--aside">
+      <div class="form-card">
+        <div class="form-status mb-0" data-state="error" hidden data-query-error></div>
+        <EnquiryForm variant="full" id="enquiry" heading="Your enquiry" />
+      </div>
+
+      <aside class="contact-aside" aria-label="Other ways to reach us">
+        {
+          site.contact.whatsapp && (
+            <div class="contact-method">
+              <span class="icon-tile">
+                <Icon name="whatsapp" size={22} />
+              </span>
+              <div>
+                <h2 class="h3">Prefer WhatsApp?</h2>
+                <p>Message us directly. Your message will include a short reference so we can pick up where you left off.</p>
+                <WhatsAppLink class="btn btn--whatsapp btn--sm mt-md">
+                  <Icon name="whatsapp" size={18} /> Open WhatsApp
+                </WhatsAppLink>
+              </div>
+            </div>
+          )
+        }
+        <div class="contact-method">
+          <span class="icon-tile">
+            <Icon name="mail" size={22} />
+          </span>
+          <div>
+            <h2 class="h3">Email</h2>
+            <p><a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></p>
+          </div>
+        </div>
+        {
+          site.contact.phone && (
+            <div class="contact-method">
+              <span class="icon-tile">
+                <Icon name="phone" size={22} />
+              </span>
+              <div>
+                <h2 class="h3">Phone</h2>
+                <p>
+                  <a href={`tel:${site.contact.phone.replace(/[^\d+]/g, '')}`}>{site.contact.phone}</a>
+                </p>
+              </div>
+            </div>
+          )
+        }
+        <div class="contact-method">
+          <span class="icon-tile">
+            <Icon name="clock" size={22} />
+          </span>
+          <div>
+            <h2 class="h3">Opening hours</h2>
+            <p>{site.contact.hours}</p>
+          </div>
+        </div>
+
+        <div class="card card--paper">
+          <h2 class="h3">What happens next</h2>
+          <ol class="next-steps mt-md">
+            <li>We read your enquiry and check we have the right person for your subject and level.</li>
+            <li>We reply {site.contact.replyTarget} with any questions and a fixed quote.</li>
+            <li>If you’re happy, we agree a time for your session or a date for your feedback.</li>
+          </ol>
+        </div>
+
+        <p class="small muted">
+          We use your details only to respond to your enquiry. See our <a href="/privacy/">privacy notice</a>.
+        </p>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // Shown only after a no-JavaScript submission was rejected by the server.
+  const err = new URLSearchParams(location.search).get('error');
+  const box = document.querySelector<HTMLElement>('[data-query-error]');
+  if (err && box) {
+    box.textContent =
+      err === 'rate' ? 'Too many submissions in a short time. Please wait a few minutes, or contact us by email.' : 'Some details were missing or invalid. Please check the form and try again.';
+    box.hidden = false;
+  }
+</script>

@@ -1,0 +1,48 @@
+---
+import site from '../../../site.config.mjs';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import WhatsAppLink from '../../components/WhatsAppLink.astro';
+import { graph, webPageLd } from '../../lib/seo';
+
+const path = '/contact/thanks/';
+const title = 'Thanks, we’ve received your enquiry';
+const description = 'Your enquiry has been received. Here’s what happens next.';
+---
+
+<BaseLayout {title} {description} {path} noindex jsonLd={graph(webPageLd({ path, title, description }))}>
+  <section class="section">
+    <div class="container container--narrow center">
+      <span class="icon-tile icon-tile--accent thanks-icon"><Icon name="check" size={26} /></span>
+      <h1>Thanks, we’ve got your enquiry</h1>
+      <p class="lead">
+        We aim to reply {site.contact.replyTarget}. Keep an eye on your inbox (and spam folder) or WhatsApp, depending on what you
+        chose.
+      </p>
+      <p class="muted" data-ref-line hidden>Your reference: <strong data-ref></strong></p>
+      <div class="btn-row thanks-actions mt-lg">
+        <a class="btn btn--brand" href="/guides/">Browse free study guides</a>
+        {
+          site.contact.whatsapp && (
+            <WhatsAppLink class="btn btn--ghost">
+              <Icon name="whatsapp" size={20} /> Add details on WhatsApp
+            </WhatsAppLink>
+          )
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .thanks-icon { width: 64px; height: 64px; margin: 0 auto 24px; border-radius: 50%; }
+  .thanks-actions { justify-content: center; }
+</style>
+
+<script>
+  const ref = new URLSearchParams(location.search).get('ref');
+  if (ref && /^[A-Z]{2}-[A-Z0-9]{5}$/.test(ref)) {
+    document.querySelector('[data-ref]')!.textContent = ref;
+    document.querySelector<HTMLElement>('[data-ref-line]')!.hidden = false;
+  }
+</script>

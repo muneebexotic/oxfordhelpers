@@ -1,0 +1,199 @@
+---
+import type { GetStaticPaths } from 'astro';
+import site from '../../site.config.mjs';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Icon from '../components/Icon.astro';
+import SectionHead from '../components/SectionHead.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
+import FaqList from '../components/FaqList.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Proof from '../components/Proof.astro';
+import WhatsAppLink from '../components/WhatsAppLink.astro';
+import { services, serviceBySlug, SUPPORT_FORMATS, type Service } from '../data/services';
+import { getGuides } from '../lib/guides';
+import { graph, webPageLd, breadcrumbLd, serviceLd, faqLd, absUrl, ogImageFor } from '../lib/seo';
+
+export const getStaticPaths = (() => services.map((s) => ({ params: { service: s.slug }, props: { service: s } }))) satisfies GetStaticPaths;
+
+interface Props {
+  service: Service;
+}
+const { service } = Astro.props;
+const path = `/${service.slug}/`;
+const url = absUrl(path);
+const crumbs = [
+  { name: 'Home', path: '/' },
+  { name: 'Services', path: '/services/' },
+  { name: service.name, path },
+];
+const related = service.related.map((slug) => serviceBySlug(slug)!).filter(Boolean);
+const guides = (await getGuides()).filter((g) => service.guides.includes(g.id));
+const formats = service.formats.map((f) => SUPPORT_FORMATS[f as keyof typeof SUPPORT_FORMATS]);
+
+const jsonLd = graph(
+  webPageLd({ path, title: service.h1, description: service.metaDescription, crumbs, image: ogImageFor(service.slug), dateModified: service.updated }),
+  breadcrumbLd(crumbs, url),
+  serviceLd(service),
+  faqLd(service.faqs, url),
+);
+---
+
+<BaseLayout title={service.seoTitle} description={service.metaDescription} {path} og={service.slug} {jsonLd} service={service.slug}>
+  <section class="page-hero">
+    <div class="container">
+      <Breadcrumbs {crumbs} />
+      <div class="page-hero__grid">
+        <div>
+          <p class="eyebrow">{service.eyebrow}</p>
+          <h1>{service.h1}</h1>
+          <p class="lead">{service.lead}</p>
+          <ul class="formats" aria-label="Available as">
+            {
+              formats.map((f) => (
+                <li>
+                  <Icon name="check" size={16} />
+                  {f.name}
+                </li>
+              ))
+            }
+          </ul>
+          <div class="btn-row">
+            <a class="btn btn--primary" href="#quote">Get a free quote <Icon name="arrow-right" size={18} /></a>
+            {
+              site.contact.whatsapp && (
+                <WhatsAppLink service={service.slug} class="btn btn--ghost">
+                  <Icon name="whatsapp" size={20} /> WhatsApp us
+                </WhatsAppLink>
+              )
+            }
+          </div>
+        </div>
+        <div class="form-card" id="quote">
+          <p class="h3">Get a free quote</p>
+          <p class="small muted">Tell us a little about your {service.noun} and we’ll reply {site.contact.replyTarget}.</p>
+          <EnquiryForm variant="compact" id="service-quote" service={service.slug} />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {
+    service.sections.map((sec, i) => (
+      <section class:list={['section', { 'section--paper': i % 2 === 1 }]} aria-labelledby={sec.id}>
+        <div class:list={['container', { 'container--narrow': sec.kind === 'prose' }]}>
+          <SectionHead title={sec.heading} id={sec.id}>
+            {sec.intro}
+          </SectionHead>
+          {sec.kind === 'cards' && (
+            <div class:list={['grid', (sec.items?.length ?? 0) % 3 === 0 ? 'grid--3' : 'grid--4']}>
+              {sec.items?.map((it) => (
+                <div class="card card--plain">
+                  <h3>{it.title}</h3>
+                  {it.text && <p>{it.text}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+          {sec.kind === 'list' && (
+            <ul class="deflist">
+              {sec.items?.map((it) => (
+                <li>
+                  <strong>{it.title}</strong>
+                  <span>{it.text}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {sec.kind === 'chips' && (
+            <ul class="chips">
+              {sec.items?.map((it) => (
+                <li>{it.title}</li>
+              ))}
+            </ul>
+          )}
+          {sec.kind === 'prose' && (
+            <div class="prose">
+              {sec.paragraphs?.map((p) => (
+                <p>{p}</p>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section section--tight" aria-labelledby="boundaries-title">
+    <div class="container">
+      <div class="boundaries">
+        <div>
+          <h2 id="boundaries-title">What we won’t do</h2>
+          <p class="muted">
+            Clear limits protect you. Everything we offer is designed to sit within UK academic integrity rules.
+            <a href="/academic-integrity/">Read our integrity policy</a>.
+          </p>
+        </div>
+        <ul class="checklist checklist--x">
+          {
+            service.boundaries.map((b) => (
+              <li>
+                <Icon name="x" size={16} />
+                {b}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--paper" aria-labelledby="process-title">
+    <div class="container">
+      <SectionHead eyebrow="How it works" title={`How ${service.label} works`} id="process-title" />
+      <ProcessSteps />
+    </div>
+  </section>
+
+  <Proof />
+
+  <section class="section" aria-labelledby="faq-title">
+    <div class="container container--narrow">
+      <SectionHead eyebrow="FAQs" title={`${service.label[0].toUpperCase() + service.label.slice(1)}: common questions`} id="faq-title" />
+      <FaqList faqs={service.faqs} />
+    </div>
+  </section>
+
+  <section class="section section--paper" aria-labelledby="related-title">
+    <div class="container">
+      <SectionHead title="Related support" id="related-title" />
+      <div class="grid grid--3">
+        {related.map((s) => <ServiceCard service={s} />)}
+      </div>
+      {
+        guides.length > 0 && (
+          <div class="mt-lg">
+            <h3>Free guides on this topic</h3>
+            <ul class="related-links grid grid--3">
+              {guides.map((g) => (
+                <li>
+                  <a href={`/guides/${g.id}/`}>
+                    <span>
+                      {g.data.title}
+                      <small>{g.minutes} min read</small>
+                    </span>
+                    <Icon name="arrow-right" size={18} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <CtaBand title={`Get help with your ${service.noun}`} service={service.slug} />
+</BaseLayout>

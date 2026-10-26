@@ -1,0 +1,46 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import Logo from '../../components/Logo.astro';
+import { adminEnabled, isAuthenticated } from '../../lib/server/auth';
+
+export const prerender = false;
+
+if (isAuthenticated(Astro.cookies)) return Astro.redirect('/admin/', 303);
+
+const error = Astro.url.searchParams.get('error');
+const messages: Record<string, string> = {
+  invalid: 'That password is incorrect.',
+  rate: 'Too many attempts. Please wait 15 minutes and try again.',
+  disabled: 'Admin access is disabled. Set ADMIN_PASSWORD on the server to enable it.',
+};
+const enabled = adminEnabled();
+---
+
+<AdminLayout title="Sign in">
+  <main class="login">
+    <div class="form-card">
+      <Logo />
+      <h1 class="h3 mt-md">Lead reporting sign-in</h1>
+      {
+        !enabled ? (
+          <p class="form-status" data-state="error">{messages.disabled}</p>
+        ) : (
+          <form method="post" action="/api/admin/login/" class="form-grid mt-md">
+            {error && messages[error] && (
+              <p class="form-status" data-state="error" role="alert">
+                {messages[error]}
+              </p>
+            )}
+            <div class="field">
+              <label for="password">Password</label>
+              <input id="password" name="password" type="password" autocomplete="current-password" required autofocus />
+            </div>
+            <button class="btn btn--brand btn--block" type="submit">
+              Sign in
+            </button>
+          </form>
+        )
+      }
+    </div>
+  </main>
+</AdminLayout>

@@ -1,0 +1,26 @@
+---
+import Icon from './Icon.astro';
+import type { Faq } from '../lib/types';
+
+interface Props {
+  faqs: Faq[];
+  group?: string;
+}
+const { faqs, group = 'faq' } = Astro.props;
+---
+
+<div class="faq">
+  {
+    faqs.map((f, i) => (
+      <details class="faq__item" name={group} open={i === 0}>
+        <summary>
+          <h3>{f.q}</h3>
+          <Icon name="chevron-down" size={22} />
+        </summary>
+        <div class="faq__a">
+          <p>{f.a}</p>
+        </div>
+      </details>
+    ))
+  }
+</div>

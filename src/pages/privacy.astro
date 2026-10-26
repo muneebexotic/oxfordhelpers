@@ -1,0 +1,113 @@
+---
+import site from '../../site.config.mjs';
+import ProseLayout from '../layouts/ProseLayout.astro';
+
+const controller = site.business.legalName || site.brand.name;
+const days = site.retentionDays;
+---
+
+<ProseLayout
+  title="Privacy Notice"
+  h1="Privacy notice"
+  eyebrow="Your data"
+  path="/privacy/"
+  description={`How ${site.brand.name} collects, uses, shares and deletes personal data from enquiries, in line with UK GDPR and the Data Protection Act 2018.`}
+  lead="What we collect when you contact us, why, how long we keep it and your rights."
+>
+  <h2>Who we are</h2>
+  <p>
+    {controller} (“we”, “us”) operates {site.domain} and is the controller of the personal data described in this notice.
+    {site.business.address && <>Our address is {site.business.address}. </>}
+    {site.business.icoRegistration && <>We are registered with the Information Commissioner’s Office under number {site.business.icoRegistration}. </>}
+    You can contact us about anything in this notice at <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.
+  </p>
+
+  <h2>What we collect</h2>
+  <ul>
+    <li>
+      <strong>Enquiry details you give us:</strong> your name, email address, phone or WhatsApp number, preferred contact method, the
+      service, level, subject and deadline you select, and your message.
+    </li>
+    <li>
+      <strong>WhatsApp messages</strong> you send us, including your number and profile name as shown by WhatsApp.
+    </li>
+    <li>
+      <strong>Limited technical information:</strong> the page you submitted the form from, the domain of the website that referred you
+      (for example “google.com”, never the full address), and any campaign tags in the link you followed.
+    </li>
+    <li>
+      <strong>Anonymous click counts:</strong> when someone clicks a WhatsApp, phone or email link we record the page, service and a
+      random reference code. This contains no name, number, IP address or cookie.
+    </li>
+  </ul>
+  <p>
+    We do not use analytics cookies, advertising trackers or third-party scripts. Your browser keeps the referring site and a WhatsApp
+    reference code in session storage, which is cleared when you close the tab. Your IP address is used briefly in memory to prevent
+    spam and abuse and is not stored.
+  </p>
+
+  <h2>How we use it, and our lawful basis</h2>
+  <ul>
+    <li>
+      <strong>To reply to your enquiry and give you a quote.</strong> This is a step you’ve asked us to take before entering a contract
+      (UK GDPR Article 6(1)(b)).
+    </li>
+    <li><strong>To provide the service</strong> if you go ahead: performance of a contract (Article 6(1)(b)).</li>
+    <li>
+      <strong>To keep the website secure and filter spam:</strong> our legitimate interests in running a safe service (Article 6(1)(f)).
+    </li>
+    <li>
+      <strong>To produce anonymised statistics about enquiries</strong>, such as the number of enquiries each month by service type and
+      channel. We may share these statistics, together with short excerpts of messages from which names, numbers, profile pictures and
+      every other identifying detail have been removed, in research, policy or evidence submissions, including to government bodies.
+      This relies on our legitimate interests (Article 6(1)(f)). No one can be identified from what we share. You can object at any
+      time and we will exclude your enquiry.
+    </li>
+  </ul>
+  <p>Please don’t include sensitive information (for example, about your health) in your message unless it’s needed to help you.</p>
+
+  <h2>How long we keep it</h2>
+  <ul>
+    <li>
+      Personal details from enquiries are automatically deleted after <strong>{days} days</strong>. An anonymous record (date, service,
+      channel) is kept for counting.
+    </li>
+    <li>
+      WhatsApp conversations that don’t lead to a booking are deleted from our devices within {days} days of the last message. Redacted
+      excerpts kept for statistics contain no personal data.
+    </li>
+    <li>
+      If you become a client, we keep what we need to provide the service and meet legal obligations, such as accounting records for six
+      years.
+    </li>
+  </ul>
+
+  <h2>Who we share it with</h2>
+  <p>
+    We never sell your data. We use service providers who process data on our behalf under contract: our website hosting provider and
+    our email provider. If you message us on WhatsApp, WhatsApp (Meta) also processes that data under its own terms. Apart from
+    anonymised statistics as described above, we only disclose personal data where the law requires it.
+  </p>
+  <p>
+    Where a provider processes data outside the UK, we rely on UK adequacy regulations or appropriate safeguards such as the UK
+    International Data Transfer Addendum.
+  </p>
+
+  <h2>Your rights</h2>
+  <p>
+    You have the right to access, correct or delete your personal data, to restrict or object to how we use it, and to data portability.
+    To use any of these rights, email <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>. We’ll respond within one
+    month.
+  </p>
+  <p>
+    If you’re unhappy with how we’ve handled your data, you can complain to the Information Commissioner’s Office at
+    <a href="https://ico.org.uk/make-a-complaint/" rel="noopener" target="_blank">ico.org.uk</a> or on 0303 123 1113. We’d appreciate the
+    chance to put things right first.
+  </p>
+
+  <h2>Children</h2>
+  <p>Our services are intended for students aged 16 and over. If you’re under 16, please ask a parent or guardian to contact us.</p>
+
+  <h2>Changes to this notice</h2>
+  <p>We’ll update this page if anything changes, and show the date of the latest version at the top.</p>
+</ProseLayout>

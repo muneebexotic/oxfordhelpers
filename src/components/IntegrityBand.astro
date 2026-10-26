@@ -1,0 +1,49 @@
+---
+import Icon from './Icon.astro';
+import { INTEGRITY } from '../data/content';
+---
+
+<section class="section integrity" aria-labelledby="integrity-title">
+  <div class="container">
+    <div class="split">
+      <div>
+        <p class="eyebrow">Academic integrity</p>
+        <h2 id="integrity-title">Help that keeps your work yours</h2>
+        <p>
+          Since 2022 it has been a criminal offence in England to provide or advertise essay-writing services to students, and every
+          UK university treats submitting someone else’s work as misconduct. Real support makes you better at the work rather than
+          doing it for you, so that’s the only kind we offer.
+        </p>
+        <p><a href="/academic-integrity/">Read our academic integrity policy</a></p>
+      </div>
+      <div class="integrity__cols">
+        <div class="integrity__col">
+          <h3><Icon name="check" size={20} /> What we do</h3>
+          <ul class="checklist">
+            {
+              INTEGRITY.do.map((t) => (
+                <li>
+                  <Icon name="check" size={16} />
+                  {t}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <div class="integrity__col">
+          <h3><Icon name="x" size={20} /> What we don’t do</h3>
+          <ul class="checklist checklist--x">
+            {
+              INTEGRITY.dont.map((t) => (
+                <li>
+                  <Icon name="x" size={16} />
+                  {t}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

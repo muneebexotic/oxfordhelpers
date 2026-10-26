@@ -1,0 +1,72 @@
+---
+import site from '../../site.config.mjs';
+import ProseLayout from '../layouts/ProseLayout.astro';
+
+const owner = site.business.legalName || site.brand.name;
+---
+
+<ProseLayout
+  title="Terms of Use and Service"
+  h1="Terms of use and service"
+  eyebrow="The small print"
+  path="/terms/"
+  description={`The terms that apply when you use the ${site.brand.name} website or book tutoring, feedback or proofreading with us, written in plain English.`}
+  lead="The basics of using this website and working with us, in plain English."
+>
+  <h2>About these terms</h2>
+  <p>
+    This website is operated by {owner}. By using the website you agree to these terms. If you book a service, the quote we send you
+    and these terms together form our agreement.
+  </p>
+
+  <h2>Our services</h2>
+  <p>
+    We provide tutoring, feedback on work you have written, proofreading and research methods coaching, as described on this website
+    and in our <a href="/academic-integrity/">academic integrity policy</a>. We do not produce work for submission. You remain
+    responsible for the work you submit and for following your institution’s rules, including any rules on declaring support.
+  </p>
+
+  <h2>Quotes and payment</h2>
+  <ul>
+    <li>Quotes are free and fixed for the scope described. They are valid for 14 days unless stated otherwise.</li>
+    <li>Payment terms, including any deposit, are set out in your quote.</li>
+    <li>If the scope changes, we’ll agree any price change with you before doing more work.</li>
+  </ul>
+
+  <h2>Cancellations and your rights</h2>
+  <p>
+    If you’re a consumer you have 14 days after booking to cancel. If you ask us to start within that period, you’ll pay for any
+    service already provided. Once a service has been fully provided, the right to cancel ends. Sessions can be rescheduled free of
+    charge with at least 24 hours’ notice. Nothing in these terms affects your statutory rights.
+  </p>
+
+  <h2>What we can’t promise</h2>
+  <p>
+    We’ll provide every service with reasonable care and skill. Because marks depend on your own work and on your institution’s
+    assessment, we cannot guarantee any grade or outcome.
+  </p>
+
+  <h2>Using this website</h2>
+  <ul>
+    <li>The content of this website, including our study guides, is ours. You may read and share links to it for personal study.</li>
+    <li>Don’t misuse the website, for example by attempting to access it without authorisation or by sending spam through our forms.</li>
+    <li>We try to keep information accurate and up to date, but it is general guidance; your institution’s own rules always take priority.</li>
+  </ul>
+
+  <h2>Liability</h2>
+  <p>
+    We are not liable for losses that were not foreseeable, or that result from your institution’s decisions or from your use of the
+    website’s general guidance. Nothing in these terms limits liability that cannot be limited by law.
+  </p>
+
+  <h2>Law</h2>
+  <p>
+    These terms are governed by the law of England and Wales. If you live elsewhere in the UK, you may also bring proceedings in your
+    local courts.
+  </p>
+
+  <h2>Contact</h2>
+  <p>
+    Questions about these terms: <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.
+  </p>
+</ProseLayout>

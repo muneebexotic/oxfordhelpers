@@ -1,0 +1,24 @@
+---
+import site from '../../site.config.mjs';
+import { serviceBySlug } from '../data/services';
+
+interface Props {
+  service?: string;
+  class?: string;
+}
+const { service, class: className } = Astro.props;
+const svc = service ? serviceBySlug(service) : undefined;
+const text = svc
+  ? `Hi ${site.brand.name}, I’d like a free quote for ${svc.label}.`
+  : `Hi ${site.brand.name}, I’d like a free quote for some academic support.`;
+// The ref code is appended on click (see scripts/tracking.ts); this href is the no-JS fallback.
+const href = `https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent(text)}`;
+---
+
+{
+  site.contact.whatsapp && (
+    <a class={className} href={href} data-wa={site.contact.whatsapp} data-wa-text={text} data-service={service} rel="noopener" target="_blank">
+      <slot />
+    </a>
+  )
+}

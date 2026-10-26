@@ -1,0 +1,94 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Icon from '../../components/Icon.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import ServiceCard from '../../components/ServiceCard.astro';
+import ProcessSteps from '../../components/ProcessSteps.astro';
+import IntegrityBand from '../../components/IntegrityBand.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { services, SUPPORT_FORMATS } from '../../data/services';
+import { graph, webPageLd, breadcrumbLd, itemListLd, absUrl, ogImageFor } from '../../lib/seo';
+
+const path = '/services/';
+const title = 'Academic Support Services for UK Students';
+const description =
+  'Compare our services: assignment and coursework tutoring, dissertation coaching, research methods and data analysis help, and report writing feedback.';
+const crumbs = [
+  { name: 'Home', path: '/' },
+  { name: 'Services', path },
+];
+const pageUrl = absUrl(path);
+
+const formatRows = [
+  { ...SUPPORT_FORMATS.tutoring, best: 'Understanding a topic, planning, getting unstuck', icon: 'users' as const },
+  { ...SUPPORT_FORMATS.feedback, best: 'Improving a draft against the marking criteria', icon: 'message' as const },
+  { ...SUPPORT_FORMATS.proofreading, best: 'A final language and formatting check', icon: 'file' as const },
+  { ...SUPPORT_FORMATS.methods, best: 'Statistics, qualitative analysis, research design', icon: 'chart' as const },
+];
+
+const jsonLd = graph(
+  webPageLd({ path, title, description, type: 'CollectionPage', crumbs, image: ogImageFor('services') }),
+  breadcrumbLd(crumbs, pageUrl),
+  itemListLd(services.map((s) => ({ name: `${s.name} support`, path: `/${s.slug}/` })), pageUrl),
+);
+---
+
+<BaseLayout {title} {description} {path} og="services" {jsonLd}>
+  <section class="page-hero">
+    <div class="container">
+      <Breadcrumbs {crumbs} />
+      <p class="eyebrow">Our services</p>
+      <h1>Academic support services</h1>
+      <p class="lead">
+        Five areas of support, four ways to work with us. Every service is built around one principle: helping you produce your own
+        best work, within your university’s rules.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="areas-title">
+    <div class="container">
+      <SectionHead title="Choose your area" id="areas-title">Select a service to see exactly what we can help with.</SectionHead>
+      <div class="services-grid">
+        {services.map((s) => <ServiceCard service={s} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--paper" aria-labelledby="formats-title">
+    <div class="container">
+      <SectionHead eyebrow="Ways to work with us" title="Pick the format that fits" id="formats-title">
+        Not sure which you need? Describe the problem when you enquire and we’ll recommend one. Many students combine a session with
+        feedback on their next draft.
+      </SectionHead>
+      <div class="grid grid--4">
+        {
+          formatRows.map((f) => (
+            <div class="card">
+              <span class="icon-tile">
+                <Icon name={f.icon} size={22} />
+              </span>
+              <h3>{f.name}</h3>
+              <p>{f.text}</p>
+              <p class="small">
+                <strong>Best for:</strong> {f.best}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <IntegrityBand />
+
+  <section class="section" aria-labelledby="process-title">
+    <div class="container">
+      <SectionHead eyebrow="How it works" title="Our four-step process" id="process-title" />
+      <ProcessSteps />
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>

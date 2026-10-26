@@ -1,0 +1,263 @@
+---
+import site from '../../../site.config.mjs';
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import Icon from '../../components/Icon.astro';
+import { SERVICE_OPTIONS, LEVEL_OPTIONS } from '../../data/services';
+import { summary, weekly, breakdown, referrers, recentEnquiries, whatsappLog, TAGS, STATUSES } from '../../lib/server/reports';
+
+export const prerender = false;
+
+const PERIODS = [
+  { days: 7, label: '7 days' },
+  { days: 30, label: '30 days' },
+  { days: 90, label: '90 days' },
+  { days: null, label: 'All time' },
+];
+const daysParam = Astro.url.searchParams.get('days');
+const days = daysParam === 'all' ? null : [7, 30, 90].includes(Number(daysParam)) ? Number(daysParam) : 30;
+
+const s = summary(days);
+const weeks = weekly(12);
+const byService = breakdown('service', days);
+const byTag = breakdown('tag', days);
+const sources = referrers(days);
+const enquiries = recentEnquiries(50);
+const chats = whatsappLog(100);
+const waError = Astro.url.searchParams.has('wa_error');
+
+const serviceLabel = (v: unknown) => SERVICE_OPTIONS.find((o) => o.value === v)?.label ?? String(v ?? '—');
+const levelLabel = (v: unknown) => LEVEL_OPTIONS.find((o) => o.value === v)?.label ?? '—';
+const tagLabel = (v: unknown) => TAGS.find((t) => t.value === v)?.label ?? String(v);
+const fmtDate = (iso: unknown) =>
+  iso ? new Date(String(iso)).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/London' }) : '—';
+const today = new Date().toISOString().slice(0, 10);
+---
+
+<AdminLayout title="Lead reporting">
+  <header class="admin-bar">
+    <strong>{site.brand.name} · Lead reporting</strong>
+    <form method="post" action="/api/admin/logout/">
+      <button class="btn btn--on-dark btn--sm" type="submit"><Icon name="logout" size={16} /> Sign out</button>
+    </form>
+  </header>
+
+  <main class="admin-main">
+    <nav class="periods" aria-label="Reporting period">
+      {
+        PERIODS.map((p) => (
+          <a href={`/admin/?days=${p.days ?? 'all'}`} aria-current={p.days === days ? "page" : undefined}>
+            {p.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <section class="kpis" aria-label="Summary">
+      <div class="kpi kpi--main"><strong>{s.leads}</strong><span>Counted leads</span></div>
+      <div class="kpi"><strong>{s.form}</strong><span>Enquiry forms</span></div>
+      <div class="kpi"><strong>{s.callback}</strong><span>Callback requests</span></div>
+      <div class="kpi"><strong>{s.whatsappChats}</strong><span>WhatsApp chats logged</span></div>
+      <div class="kpi"><strong>{s.whatsappClicks}</strong><span>WhatsApp button clicks</span></div>
+      <div class="kpi"><strong>{s.phoneClicks + s.emailClicks}</strong><span>Phone / email clicks</span></div>
+      <div class="kpi"><strong>{s.spamBlocked}</strong><span>Bot submissions blocked</span></div>
+    </section>
+
+    <section class="panel">
+      <h2>How leads are counted</h2>
+      <p class="muted">
+        <strong>Counted leads</strong> = enquiry forms + callback requests + WhatsApp conversations you have logged below. Entries tagged
+        <em>Duplicate</em> or <em>Spam / test</em> are excluded everywhere. WhatsApp <em>button clicks</em> show intent only. A click becomes a
+        lead when you log the conversation, matched by its reference code. Personal data is purged automatically after {site.retentionDays} days.
+        Exports contain counts and reference codes only.
+      </p>
+      <div class="btn-row">
+        <a class="btn btn--brand btn--sm" href="/api/admin/export/?type=aggregates"><Icon name="download" size={16} /> Weekly counts (CSV)</a>
+        <a class="btn btn--ghost btn--sm" href="/api/admin/export/?type=whatsapp"><Icon name="download" size={16} /> WhatsApp evidence register (CSV)</a>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Last 12 weeks</h2>
+      <p class="muted">Weeks start on Monday.</p>
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr><th>Week starting</th><th class="num">Forms</th><th class="num">Callbacks</th><th class="num">WhatsApp chats</th><th class="num">Counted leads</th><th class="num">WhatsApp clicks</th></tr>
+          </thead>
+          <tbody>
+            {weeks.length === 0 && <tr><td colspan="6" class="muted">No data yet.</td></tr>}
+            {
+              weeks.map((w) => (
+                <tr>
+                  <td>{w.week}</td>
+                  <td class="num">{w.form}</td>
+                  <td class="num">{w.callback}</td>
+                  <td class="num">{w.whatsapp_chat}</td>
+                  <td class="num"><strong>{w.leads}</strong></td>
+                  <td class="num">{w.whatsapp_click}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="three">
+      <section class="panel">
+        <h2>By service</h2>
+        <table class="data">
+          <tbody>
+            {byService.length === 0 && <tr><td class="muted">No data yet.</td></tr>}
+            {byService.map((r) => <tr><td>{serviceLabel(r.key)}</td><td class="num">{r.n}</td></tr>)}
+          </tbody>
+        </table>
+      </section>
+      <section class="panel">
+        <h2>By tag</h2>
+        <table class="data">
+          <tbody>
+            {byTag.length === 0 && <tr><td class="muted">No data yet.</td></tr>}
+            {byTag.map((r) => <tr><td>{tagLabel(r.key)}</td><td class="num">{r.n}</td></tr>)}
+          </tbody>
+        </table>
+      </section>
+      <section class="panel">
+        <h2>Referring sites (forms)</h2>
+        <table class="data">
+          <tbody>
+            {sources.length === 0 && <tr><td class="muted">No data yet.</td></tr>}
+            {sources.map((r) => <tr><td>{r.key}</td><td class="num">{r.n}</td></tr>)}
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <section class="panel" id="whatsapp">
+      <h2>Log a WhatsApp conversation</h2>
+      <p class="muted">
+        Record each genuine WhatsApp enquiry here. Do <strong>not</strong> enter names, numbers or message text. Copy the reference code
+        (e.g. {site.brand.initials}-7K2PQ) from the first message if present, and the file name of the redacted screenshot.
+      </p>
+      {waError && <p class="form-status" data-state="error">Please give a date, service and tag.</p>}
+      <form class="wa-form" method="post" action="/api/admin/whatsapp/">
+        <div class="field">
+          <label for="wa-date">Chat started</label>
+          <input id="wa-date" name="received_on" type="date" value={today} max={today} required />
+        </div>
+        <div class="field">
+          <label for="wa-ref">Reference code</label>
+          <input id="wa-ref" name="ref" type="text" placeholder={`${site.brand.initials}-XXXXX`} maxlength="8" pattern="[A-Za-z]{2}-[A-Za-z0-9]{5}" />
+        </div>
+        <div class="field">
+          <label for="wa-service">Service</label>
+          <select id="wa-service" name="service" required>
+            {SERVICE_OPTIONS.map((o) => <option value={o.value}>{o.label}</option>)}
+          </select>
+        </div>
+        <div class="field">
+          <label for="wa-tag">Tag</label>
+          <select id="wa-tag" name="tag" required>
+            {TAGS.filter((t) => t.value !== 'untagged').map((t) => <option value={t.value}>{t.label}</option>)}
+          </select>
+        </div>
+        <div class="field">
+          <label for="wa-evidence">Redacted screenshot file</label>
+          <input id="wa-evidence" name="evidence_id" type="text" placeholder="WA-2026-11-03-01.png" maxlength="120" />
+        </div>
+        <div class="field">
+          <label for="wa-note">Note (no personal data)</label>
+          <input id="wa-note" name="note" type="text" maxlength="300" placeholder="e.g. Master’s, stats help" />
+        </div>
+        <label class="check"><input type="checkbox" name="redacted" value="1" /> Screenshot redacted</label>
+        <button class="btn btn--brand btn--sm" type="submit">Add to register</button>
+      </form>
+
+      <div class="table-wrap mt-md">
+        <table class="data">
+          <thead><tr><th>Chat date</th><th>Ref</th><th>Matched click</th><th>Service</th><th>Tag</th><th>Redacted</th><th>Evidence file</th><th>Note</th><th></th></tr></thead>
+          <tbody>
+            {chats.length === 0 && <tr><td colspan="9" class="muted">No conversations logged yet.</td></tr>}
+            {
+              chats.map((c) => (
+                <tr>
+                  <td>{c.received_on}</td>
+                  <td>{c.ref ?? '—'}</td>
+                  <td>{Number(c.matched_clicks) > 0 ? <span class="badge">Yes</span> : <span class="badge badge--muted">No</span>}</td>
+                  <td>{serviceLabel(c.service)}</td>
+                  <td>{tagLabel(c.tag)}</td>
+                  <td>{c.redacted ? <span class="badge">Yes</span> : <span class="badge badge--warn">Pending</span>}</td>
+                  <td>{c.evidence_id ?? '—'}</td>
+                  <td>{c.note ?? ''}</td>
+                  <td>
+                    <form class="row-form" method="post" action="/api/admin/whatsapp/">
+                      <input type="hidden" name="action" value="delete" />
+                      <input type="hidden" name="id" value={String(c.id)} />
+                      <button class="btn-xs btn-xs--danger" type="submit">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="enquiries">
+      <h2>Recent enquiries</h2>
+      <p class="muted">Use these details only to reply. Tag each enquiry so it’s counted correctly.</p>
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr><th>Received</th><th>Ref</th><th>Channel</th><th>Service / level</th><th>Contact</th><th>Message</th><th>Status &amp; tag</th></tr>
+          </thead>
+          <tbody>
+            {enquiries.length === 0 && <tr><td colspan="7" class="muted">No enquiries yet.</td></tr>}
+            {
+              enquiries.map((e) => (
+                <tr>
+                  <td>{fmtDate(e.created_at)}</td>
+                  <td>{e.ref}</td>
+                  <td>{e.channel === 'callback' ? 'Callback' : 'Form'}</td>
+                  <td>
+                    {serviceLabel(e.service)}
+                    <br />
+                    <span class="muted">{levelLabel(e.level)}</span>
+                    {e.deadline && <><br /><span class="muted">Due {e.deadline}</span></>}
+                  </td>
+                  <td>
+                    {e.purged_at ? (
+                      <span class="muted">Personal data deleted</span>
+                    ) : (
+                      <>
+                        <strong>{e.name}</strong>
+                        {e.email && <><br /><a href={`mailto:${e.email}`}>{e.email}</a></>}
+                        {e.phone && <><br />{e.phone}</>}
+                        <br />
+                        <span class="muted">Prefers {e.contact_pref}</span>
+                      </>
+                    )}
+                  </td>
+                  <td class="msg">{e.purged_at ? '' : [e.subject, e.message].filter(Boolean).join('\n\n')}</td>
+                  <td>
+                    <form class="row-form" method="post" action="/api/admin/enquiry/">
+                      <input type="hidden" name="id" value={String(e.id)} />
+                      <select name="status" aria-label="Status">
+                        {STATUSES.map((st) => <option value={st.value} selected={st.value === e.status}>{st.label}</option>)}
+                      </select>
+                      <select name="tag" aria-label="Tag">
+                        {TAGS.map((t) => <option value={t.value} selected={t.value === e.tag}>{t.label}</option>)}
+                      </select>
+                      <button type="submit">Save</button>
+                    </form>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</AdminLayout>
