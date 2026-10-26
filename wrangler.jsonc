@@ -1,0 +1,30 @@
+// Cloudflare Workers config. Static pages are served as assets; the enquiry API,
+// event counter and /admin/ run in the Worker against the D1 database.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "oxfordhelpers",
+  "main": "./src/worker.ts",
+  "compatibility_date": "2026-10-19",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "oxfordhelpers-leads",
+      // Created automatically on first deploy. Paste the id here afterwards (wrangler prints it)
+      // so later deploys and `npm run db:migrate:remote` always target the same database.
+      "migrations_dir": "migrations"
+    }
+  ],
+  // Daily retention purge and rate-limit cleanup (03:17 UTC).
+  "triggers": { "crons": ["17 3 * * *"] },
+  "vars": {
+    // Where new-enquiry notifications go. Empty disables them.
+    "NOTIFY_EMAIL": "",
+    "MAIL_FROM": "Oxford Helpers <no-reply@oxfordhelpers.co.uk>",
+    // "1" sends the visitor an acknowledgement email with their reference.
+    "AUTO_REPLY": "0"
+  }
+  // Secrets (set with `npx wrangler secret put <NAME>`, never committed):
+  //   ADMIN_PASSWORD, SESSION_SECRET, RESEND_API_KEY
+}

@@ -270,7 +270,7 @@ const isFull = variant === 'full';
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           body: JSON.stringify(data),
         });
-        const body = await res.json().catch(() => ({}));
+        const body = (await res.json().catch(() => ({}))) as { ok?: boolean; ref?: string | null; errors?: Record<string, string> };
         if (res.ok && body.ok) {
           if (form.dataset.variant === 'callback') {
             const done = document.createElement('div');
@@ -278,12 +278,12 @@ const isFull = variant === 'full';
             done.setAttribute('role', 'status');
             const title = document.createElement('p');
             title.innerHTML = '<strong>Thanks, we’ll message you soon.</strong>';
-            done.append(title);
+            done.appendChild(title);
             if (body.ref) {
               const ref = document.createElement('p');
               ref.className = 'small muted';
               ref.textContent = `Your reference: ${body.ref}`;
-              done.append(ref);
+              done.appendChild(ref);
             }
             form.replaceChildren(done);
           } else {
@@ -292,7 +292,7 @@ const isFull = variant === 'full';
           return;
         }
         if (body.errors) {
-          for (const [name, msg] of Object.entries(body.errors as Record<string, string>)) setError(form, name, msg);
+          for (const [name, msg] of Object.entries(body.errors)) setError(form, name, msg);
         }
         status.dataset.state = 'error';
         status.textContent =

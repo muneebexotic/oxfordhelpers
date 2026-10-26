@@ -15,7 +15,7 @@ const SERVICES = new Set(SERVICE_OPTIONS.map((o) => o.value));
  */
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   const noContent = new Response(null, { status: 204, headers: { 'Cache-Control': 'no-store' } });
-  if (!rateLimit(`event:${clientIp(request, clientAddress)}`, 60, 60_000)) return noContent;
+  if (!(await rateLimit(`event:${clientIp(clientAddress)}`, 60, 60_000))) return noContent;
 
   let data: Record<string, unknown>;
   try {
@@ -33,9 +33,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   const service = typeof data.service === 'string' && SERVICES.has(data.service) ? data.service : null;
   const ref = typeof data.ref === 'string' && REF_PATTERN.test(data.ref) ? data.ref : null;
 
-  getDb()
+  await getDb()
     .prepare(`INSERT INTO events (created_at, type, page, service, ref, referrer_host) VALUES (?, ?, ?, ?, ?, ?)`)
-    .run(nowIso(), type, page, service, ref, referrerHost(typeof data.referrer === 'string' ? data.referrer : null));
+    .bind(nowIso(), type, page, service, ref, referrerHost(typeof data.referrer === 'string' ? data.referrer : null))
+    .run();
 
   return noContent;
 };

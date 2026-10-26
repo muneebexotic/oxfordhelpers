@@ -1,15 +1,14 @@
-import { createHmac, randomBytes, timingSafeEqual, scryptSync } from 'node:crypto';
+import { createHmac, timingSafeEqual, scryptSync } from 'node:crypto';
 import type { AstroCookies } from 'astro';
 
 const COOKIE = 'admin_session';
 const MAX_AGE_S = 12 * 60 * 60;
 
-// Without SESSION_SECRET, sessions still work but are invalidated on every restart.
-const secret = process.env.SESSION_SECRET || randomBytes(32).toString('hex');
+// Secrets come from Worker secrets (process.env is populated under nodejs_compat).
+// Worker instances don't share memory, so a stable SESSION_SECRET is required for sessions to work.
+export const adminEnabled = () => Boolean(process.env.ADMIN_PASSWORD && process.env.SESSION_SECRET);
 
-export const adminEnabled = () => Boolean(process.env.ADMIN_PASSWORD);
-
-const sign = (payload: string) => createHmac('sha256', secret).update(payload).digest('base64url');
+const sign = (payload: string) => createHmac('sha256', process.env.SESSION_SECRET!).update(payload).digest('base64url');
 
 function safeEqual(a: string, b: string) {
   // Hash both sides first so lengths always match and timing doesn't leak length.

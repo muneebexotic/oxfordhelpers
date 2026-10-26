@@ -4,9 +4,9 @@ import { exportAggregates, exportWhatsappRegister } from '../../../lib/server/re
 export const prerender = false;
 
 /** CSV downloads for reporting. Neither export contains names, emails, numbers or message text. */
-export const GET: APIRoute = ({ url }) => {
+export const GET: APIRoute = async ({ url }) => {
   const kind = url.searchParams.get('type') === 'whatsapp' ? 'whatsapp' : 'aggregates';
-  const csv = kind === 'whatsapp' ? exportWhatsappRegister() : exportAggregates();
+  const csv = kind === 'whatsapp' ? await exportWhatsappRegister() : await exportAggregates();
   const date = new Date().toISOString().slice(0, 10);
   return new Response(csv, {
     headers: {

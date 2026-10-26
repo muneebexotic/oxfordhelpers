@@ -6,7 +6,7 @@ export const prerender = false;
 
 export const POST: APIRoute = async ({ request, cookies, redirect, clientAddress, url }) => {
   if (!adminEnabled()) return redirect('/admin/login/?error=disabled', 303);
-  if (!rateLimit(`login:${clientIp(request, clientAddress)}`, 5, 15 * 60_000)) {
+  if (!(await rateLimit(`login:${clientIp(clientAddress)}`, 5, 15 * 60_000))) {
     return redirect('/admin/login/?error=rate', 303);
   }
   const form = await request.formData();

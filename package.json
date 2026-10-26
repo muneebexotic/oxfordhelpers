@@ -3,22 +3,24 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Academic support website (Oxford Helpers / Cambridge Helpers) with enquiry backend, lead reporting and full SEO setup.",
+  "description": "Academic support website (Oxford Helpers / Cambridge Helpers) with enquiry backend, lead reporting and full SEO setup. Runs on Cloudflare Workers + D1.",
   "engines": {
     "node": ">=22.23.4"
   },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build && node scripts/seo-audit.mjs",
-    "start": "node --disable-warning=ExperimentalWarning dist/server/entry.mjs",
-    "preview": "node --env-file-if-exists=.env --disable-warning=ExperimentalWarning dist/server/entry.mjs",
+    "preview": "npm run build && wrangler dev",
+    "deploy": "npm run build && wrangler deploy",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
+    "cf-typegen": "wrangler types --strict-vars=false",
     "audit:seo": "node scripts/seo-audit.mjs",
     "check": "astro check"
   },
   "dependencies": {
-    "@astrojs/node": "^11.1.9",
-    "astro": "^7.4.2",
-    "nodemailer": "^10.2.1"
+    "@astrojs/cloudflare": "^14.4.2",
+    "astro": "^7.4.2"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
@@ -26,10 +28,10 @@
     "@fontsource/fraunces": "^5.3.0",
     "@fontsource/inter": "^5.3.0",
     "@types/node": "^24.19.2",
-    "@types/nodemailer": "^8.0.2",
     "satori": "^0.63.2",
     "sharp": "^0.35.5",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "wrangler": "^4.152.0"
   },
   "overrides": {
     "fflate": "^0.8.3"

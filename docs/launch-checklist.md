@@ -2,13 +2,13 @@
 
 ## Configuration
 
-- [ ] `SITE_DOMAIN` set to the domain you own; DNS for apex and `www` points at the server
+- [ ] `SITE_DOMAIN` set to the domain you own; apex and `www` added as custom domains on the Worker; www → apex redirect rule on
 - [ ] `CONTACT_EMAIL` mailbox exists and is monitored
 - [ ] `CONTACT_WHATSAPP` (and optionally `CONTACT_PHONE`) set to the business number
 - [ ] `REPLY_TARGET` and `CONTACT_HOURS` reflect what you can actually deliver
-- [ ] `ADMIN_PASSWORD` (long, random) and `SESSION_SECRET` (`openssl rand -hex 32`) set
-- [ ] SMTP configured and `NOTIFY_EMAIL` receiving test notifications
-- [ ] `ACME_EMAIL` set; HTTPS certificate issued (`docker compose logs caddy`)
+- [ ] `ADMIN_PASSWORD` (long, random) and `SESSION_SECRET` (`openssl rand -hex 32`) set as Worker secrets
+- [ ] `RESEND_API_KEY` secret set, sending domain verified in Resend, and `NOTIFY_EMAIL` receiving test notifications
+- [ ] `npm run db:migrate:remote` applied; a test enquiry appears in `/admin/` (then tag it Spam / test)
 - [ ] Business details (`BUSINESS_*`) set only where true; ICO data protection fee paid (most organisations that process personal data must pay it) and `BUSINESS_ICO_NUMBER` added
 
 ## Claims register

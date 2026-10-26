@@ -22,7 +22,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 
   if (action === 'delete') {
     const id = Number(form.get('id'));
-    if (Number.isInteger(id)) db.prepare('DELETE FROM whatsapp_log WHERE id = ?').run(id);
+    if (Number.isInteger(id)) await db.prepare('DELETE FROM whatsapp_log WHERE id = ?').bind(id).run();
     return redirect('/admin/#whatsapp', 303);
   }
 
@@ -39,10 +39,13 @@ export const POST: APIRoute = async ({ request, redirect }) => {
     return redirect('/admin/?wa_error=1#whatsapp', 303);
   }
 
-  db.prepare(
+  await db
+    .prepare(
     `INSERT INTO whatsapp_log (created_at, received_on, ref, service, tag, evidence_id, redacted, note)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-  ).run(nowIso(), receivedOn, ref, service, tag, evidence, redacted, note);
+  )
+    .bind(nowIso(), receivedOn, ref, service, tag, evidence, redacted, note)
+    .run();
 
   return redirect('/admin/#whatsapp', 303);
 };

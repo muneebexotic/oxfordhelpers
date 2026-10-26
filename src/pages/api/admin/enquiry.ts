@@ -11,7 +11,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
   const status = String(form.get('status') ?? '');
   const tag = String(form.get('tag') ?? '');
   if (Number.isInteger(id) && isStatus(status) && isTag(tag)) {
-    getDb().prepare('UPDATE enquiries SET status = ?, tag = ? WHERE id = ?').run(status, tag, id);
+    await getDb().prepare('UPDATE enquiries SET status = ?, tag = ? WHERE id = ?').bind(status, tag, id).run();
   }
   return redirect('/admin/#enquiries', 303);
 };

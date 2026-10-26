@@ -8,7 +8,7 @@ What is implemented in the code, how pages map to search intent, and a legitimat
 | --- | --- |
 | Rendering | All public pages are prerendered static HTML. Content is visible without JavaScript. |
 | Canonicals | Absolute, self-referencing canonical on every page, built from `SITE_DOMAIN`. One URL form: HTTPS, apex domain, trailing slash. |
-| Redirects | Caddy: `http` → `https`, `www` → apex, optional alternate domain → primary (all 301). App: 301s for likely/legacy paths (`/order/`, `/services/dissertation/`, `/blog/` …) and trailing-slash normalisation. |
+| Redirects | Cloudflare: `http` → `https` (Always Use HTTPS), `www` → apex and optional alternate domain → primary (Redirect Rules, 301). App: 301s for likely/legacy paths (`/order/`, `/services/dissertation/`, `/blog/` …) and trailing-slash normalisation. |
 | Sitemap | `/sitemap.xml` lists exactly the indexable pages with accurate `lastmod` dates. The build audit fails if it drifts. |
 | robots.txt | Allows everything except `/admin/` and `/api/`; references the sitemap. |
 | Indexing control | Thank-you, 404, admin and API responses are `noindex` (meta tag or `X-Robots-Tag`). |

@@ -1,11 +1,9 @@
-import { randomInt } from 'node:crypto';
+import { createHmac, randomInt } from 'node:crypto';
 import site from '../../../site.config.mjs';
+import { getDb } from './db';
 
-export function clientIp(request: Request, clientAddress: string | undefined) {
-  if (process.env.TRUST_PROXY === '1') {
-    const fwd = request.headers.get('x-forwarded-for');
-    if (fwd) return fwd.split(',')[0].trim();
-  }
+/** Visitor IP as reported by Cloudflare (the adapter reads cf-connecting-ip into clientAddress). */
+export function clientIp(clientAddress: string | undefined) {
   return clientAddress || 'unknown';
 }
 
@@ -20,24 +18,25 @@ export function referrerHost(value: string | null | undefined) {
   }
 }
 
-/** Fixed-window in-memory rate limiter. Sufficient for a single-instance deployment. */
-const buckets = new Map<string, { count: number; resetAt: number }>();
-
-export function rateLimit(key: string, limit: number, windowMs: number) {
+/**
+ * Fixed-window rate limiter shared across Worker instances via D1.
+ * The key (which contains an IP) is stored only as a keyed hash, and rows expire with the window.
+ */
+export async function rateLimit(key: string, limit: number, windowMs: number) {
   const now = Date.now();
-  const bucket = buckets.get(key);
-  if (!bucket || bucket.resetAt <= now) {
-    buckets.set(key, { count: 1, resetAt: now + windowMs });
-    return true;
-  }
-  bucket.count += 1;
-  return bucket.count <= limit;
+  const hashed = createHmac('sha256', process.env.SESSION_SECRET || 'rate-limit').update(key).digest('base64url');
+  const row = await getDb()
+    .prepare(
+      `INSERT INTO rate_limits (key, count, reset_at) VALUES (?1, 1, ?2)
+       ON CONFLICT(key) DO UPDATE SET
+         count = CASE WHEN reset_at <= ?3 THEN 1 ELSE count + 1 END,
+         reset_at = CASE WHEN reset_at <= ?3 THEN ?2 ELSE reset_at END
+       RETURNING count`,
+    )
+    .bind(hashed, now + windowMs, now)
+    .first<{ count: number }>();
+  return (row?.count ?? 1) <= limit;
 }
-
-setInterval(() => {
-  const now = Date.now();
-  for (const [k, b] of buckets) if (b.resetAt <= now) buckets.delete(k);
-}, 60_000).unref();
 
 const REF_ALPHABET = '23456789ABCDEFGHJKMNPQRSTVWXYZ';
 

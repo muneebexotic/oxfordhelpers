@@ -34,7 +34,8 @@ const config = {
   contact: {
     email: env('CONTACT_EMAIL', `hello@${domain}`),
     // International format, digits only, e.g. 447700900123. Leave empty to hide WhatsApp.
-    whatsapp: env('CONTACT_WHATSAPP', ''),
+    // TODO: test number; replace with the live business number before launch.
+    whatsapp: env('CONTACT_WHATSAPP', '923103535835'),
     // Display format, e.g. "+44 7700 900123". Leave empty to hide phone links.
     phone: env('CONTACT_PHONE', ''),
     hours: env('CONTACT_HOURS', 'Monday to Saturday, 9am to 8pm (UK time)'),
@@ -100,7 +101,7 @@ const config = {
   retentionDays: Number(env('RETENTION_DAYS', '180')),
 
   // Date the legal pages were last reviewed (shown on the pages).
-  legalUpdated: '2026-10-25',
+  legalUpdated: '2026-10-26',
 };
 
 export default config;

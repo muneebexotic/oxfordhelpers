@@ -1,19 +1,24 @@
 import { defineConfig, passthroughImageService } from 'astro/config';
-import node from '@astrojs/node';
+import cloudflare from '@astrojs/cloudflare';
 import site from './site.config.mjs';
 
 export default defineConfig({
   site: site.url,
   trailingSlash: 'always',
   output: 'static', // marketing pages are prerendered; API + admin opt out with `prerender = false`
-  adapter: node({ mode: 'standalone' }),
+  adapter: cloudflare({
+    // Prerender in Node so build-time OG/icon generation (satori + sharp) works.
+    prerenderEnvironment: 'node',
+    imageService: 'passthrough',
+  }),
+  session: false, // admin auth uses its own signed cookie; no KV session store needed
   build: {
     format: 'directory',
     inlineStylesheets: 'always', // one small stylesheet -> inline it, no render-blocking request
   },
   security: {
-    checkOrigin: true, // uses Sec-Fetch-Site, so it also works behind the TLS proxy
-    // Trust X-Forwarded-Host/Proto only for our own domain (set by Caddy).
+    checkOrigin: true, // uses Sec-Fetch-Site
+    // Trust X-Forwarded-Host/Proto only for our own domain.
     allowedDomains: [
       { hostname: site.domain, protocol: 'https' },
       { hostname: `www.${site.domain}`, protocol: 'https' },
@@ -26,7 +31,7 @@ export default defineConfig({
   image: { service: passthroughImageService() },
   markdown: { syntaxHighlight: false }, // no code blocks; Shiki's inline styles conflict with CSP
   prefetch: { prefetchAll: false, defaultStrategy: 'hover' },
-  // 301s for likely/legacy paths. Host-level redirects (www, http, alternate domain) live in the Caddyfile.
+  // 301s for likely/legacy paths. Host-level redirects (www -> apex) are a Cloudflare Redirect Rule.
   redirects: {
     '/order/': '/contact/',
     '/order-now/': '/contact/',
@@ -51,6 +56,5 @@ export default defineConfig({
   },
   vite: {
     build: { assetsInlineLimit: 0 },
-    ssr: { external: ['node:sqlite'] },
   },
 });

@@ -1,0 +1,7 @@
+# Local runtime secrets for `npm run dev` / `npm run preview`. Copy to .dev.vars (never committed).
+# In production set each with: npx wrangler secret put <NAME>
+ADMIN_PASSWORD=
+# Random 32+ character string, e.g. `openssl rand -hex 32`
+SESSION_SECRET=
+# Optional: https://resend.com API key for enquiry notification emails.
+RESEND_API_KEY=

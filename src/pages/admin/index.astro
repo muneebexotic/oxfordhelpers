@@ -16,13 +16,15 @@ const PERIODS = [
 const daysParam = Astro.url.searchParams.get('days');
 const days = daysParam === 'all' ? null : [7, 30, 90].includes(Number(daysParam)) ? Number(daysParam) : 30;
 
-const s = summary(days);
-const weeks = weekly(12);
-const byService = breakdown('service', days);
-const byTag = breakdown('tag', days);
-const sources = referrers(days);
-const enquiries = recentEnquiries(50);
-const chats = whatsappLog(100);
+const [s, weeks, byService, byTag, sources, enquiries, chats] = await Promise.all([
+  summary(days),
+  weekly(12),
+  breakdown('service', days),
+  breakdown('tag', days),
+  referrers(days),
+  recentEnquiries(50),
+  whatsappLog(100),
+]);
 const waError = Astro.url.searchParams.has('wa_error');
 
 const serviceLabel = (v: unknown) => SERVICE_OPTIONS.find((o) => o.value === v)?.label ?? String(v ?? '—');

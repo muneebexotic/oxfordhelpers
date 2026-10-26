@@ -18,7 +18,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   let response = await next();
   // Redirect responses can carry immutable headers; copy before modifying.
   response = new Response(response.body, response);
-  // Dynamic routes are never indexed or cached. Site-wide security headers are set by the proxy (Caddyfile).
+  // Dynamic routes are never indexed or cached. Site-wide security headers for static pages live in public/_headers.
   response.headers.set('X-Robots-Tag', 'noindex, nofollow');
   response.headers.set('Cache-Control', 'no-store');
   response.headers.set('X-Content-Type-Options', 'nosniff');
