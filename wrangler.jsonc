@@ -11,6 +11,7 @@
     {
       "binding": "DB",
       "database_name": "oxfordhelpers-leads",
+      "database_id": "78f96260-5a34-48ac-847a-6c4326256345",
       // Created automatically on first deploy. Paste the id here afterwards (wrangler prints it)
       // so later deploys and `npm run db:migrate:remote` always target the same database.
       "migrations_dir": "migrations"
