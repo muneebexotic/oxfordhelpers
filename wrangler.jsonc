@@ -7,13 +7,20 @@
   "compatibility_date": "2026-10-19",
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
+  // Served only on the real domain; Cloudflare creates the DNS records and certificates on deploy.
+  // www is attached so it has a record, and a "WWW to root" Redirect Rule 301s it to the apex.
+  "routes": [
+    { "pattern": "oxfordhelpers.co.uk", "custom_domain": true },
+    { "pattern": "www.oxfordhelpers.co.uk", "custom_domain": true }
+  ],
+  // No duplicate copies of the site on *.workers.dev or preview URLs.
+  "workers_dev": false,
+  "preview_urls": false,
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "oxfordhelpers-leads",
       "database_id": "78f96260-5a34-48ac-847a-6c4326256345",
-      // Created automatically on first deploy. Paste the id here afterwards (wrangler prints it)
-      // so later deploys and `npm run db:migrate:remote` always target the same database.
       "migrations_dir": "migrations"
     }
   ],
