@@ -16,7 +16,7 @@ document.addEventListener(
       const text = `${link.dataset.waText ?? ''} (Ref: ${ref})`.trim();
       link.href = `https://wa.me/${link.dataset.wa}?text=${encodeURIComponent(text)}`;
       track('whatsapp_click', { service, ref });
-    } else if (href.startsWith('tel:')) {
+    } else if (href.startsWith('tel:') || href.startsWith('sms:')) {
       track('phone_click', { service });
     } else if (href.startsWith('mailto:')) {
       track('email_click', { service });

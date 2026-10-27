@@ -4,7 +4,7 @@
 
 - [ ] `SITE_DOMAIN` set to the domain you own; apex and `www` added as custom domains on the Worker; www → apex redirect rule on
 - [ ] `CONTACT_EMAIL` mailbox exists and is monitored
-- [ ] `CONTACT_WHATSAPP` (and optionally `CONTACT_PHONE`) set to the business number
+- [x] `CONTACT_WHATSAPP` and `CONTACT_PHONE` set to the business number (+44 7412 824595: WhatsApp, calls and texts)
 - [ ] `REPLY_TARGET` and `CONTACT_HOURS` reflect what you can actually deliver
 - [ ] `ADMIN_PASSWORD` (long, random) and `SESSION_SECRET` (`openssl rand -hex 32`) set as Worker secrets
 - [ ] `RESEND_API_KEY` secret set, sending domain verified in Resend, and `NOTIFY_EMAIL` receiving test notifications

@@ -70,10 +70,25 @@ const jsonLd = graph(webPageLd({ path, title, description, type: 'ContactPage', 
                 <Icon name="phone" size={22} />
               </span>
               <div>
-                <h2 class="h3">Phone</h2>
+                <h2 class="h3">Call or text</h2>
                 <p>
                   <a href={`tel:${site.contact.phone.replace(/[^\d+]/g, '')}`}>{site.contact.phone}</a>
+                  {' · '}
+                  <a href={`sms:${site.contact.phone.replace(/[^\d+]/g, '')}`}>Send a text</a>
                 </p>
+              </div>
+            </div>
+          )
+        }
+        {
+          site.business.address && (
+            <div class="contact-method">
+              <span class="icon-tile">
+                <Icon name="pin" size={22} />
+              </span>
+              <div>
+                <h2 class="h3">Postal address</h2>
+                <p>{site.business.legalName || site.brand.name}, {site.business.address}</p>
               </div>
             </div>
           )

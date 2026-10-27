@@ -34,10 +34,9 @@ const config = {
   contact: {
     email: env('CONTACT_EMAIL', `hello@${domain}`),
     // International format, digits only, e.g. 447700900123. Leave empty to hide WhatsApp.
-    // TODO: test number; replace with the live business number before launch.
-    whatsapp: env('CONTACT_WHATSAPP', '923103535835'),
-    // Display format, e.g. "+44 7700 900123". Leave empty to hide phone links.
-    phone: env('CONTACT_PHONE', ''),
+    whatsapp: env('CONTACT_WHATSAPP', '447412824595'),
+    // Display format, e.g. "+44 7700 900123". Used for call and text links. Leave empty to hide them.
+    phone: env('CONTACT_PHONE', '+44 7412 824595'),
     hours: env('CONTACT_HOURS', 'Monday to Saturday, 9am to 8pm (UK time)'),
     // Only promise what you can actually meet.
     replyTarget: env('REPLY_TARGET', 'within one working day'),
@@ -48,7 +47,7 @@ const config = {
     legalName: env('BUSINESS_LEGAL_NAME', ''),
     companyNumber: env('BUSINESS_COMPANY_NUMBER', ''),
     // Set a full postal address only if visitors can genuinely reach you there.
-    address: env('BUSINESS_ADDRESS', ''),
+    address: env('BUSINESS_ADDRESS', '10 Milk Street, London EC2V 8AN, United Kingdom'),
     icoRegistration: env('BUSINESS_ICO_NUMBER', ''),
   },
 
